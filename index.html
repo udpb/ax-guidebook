@@ -6,6 +6,7 @@
 <title>AX 컨설턴트 가이드북 — 사전학습</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+*{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--o:#FF6600;--dk:#111;--gy:#888;--wh:#FFF;--cd:#1E1E1E;--bd:#333;--bl:#6496FF;--gn:#00C896;--rd:#FF4444;--yw:#FFD700;--pp:#9C42F5}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--dk);color:var(--wh);line-height:1.8;font-size:15px}
@@ -895,6 +896,13 @@ function restart(){
 }
 // init
 updateProgress();
+
+// 복사 방지
+document.addEventListener("copy",function(e){e.preventDefault();});
+document.addEventListener("cut",function(e){e.preventDefault();});
+document.addEventListener("contextmenu",function(e){e.preventDefault();});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+document.addEventListener("selectstart",function(e){e.preventDefault();});
 </script>
 </body>
 </html>
