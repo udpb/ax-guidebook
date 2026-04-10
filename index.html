@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AX 컨설턴트 가이드북 — 사전학습</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--o:#FF6600;--dk:#111;--gy:#888;--wh:#FFF;--cd:#1E1E1E;--bd:#333;--bl:#6496FF;--gn:#00C896;--rd:#FF4444;--yw:#FFD700;--pp:#9C42F5}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--dk);color:var(--wh);line-height:1.8;font-size:15px}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(17,17,17,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.nav-top{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;padding:10px 24px}
+.nav-logo{color:var(--o);font-weight:900;font-size:18px}
+.nav-progress{display:flex;align-items:center;gap:10px}
+.nav-progress-bar{width:140px;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.nav-progress-fill{height:100%;background:var(--o);border-radius:2px;transition:width .4s ease}
+.nav-progress-text{color:var(--gy);font-size:11px;white-space:nowrap}
+
+/* ── TAB BAR ── */
+.tab-bar{background:#161616;border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-list{display:flex;max-width:960px;margin:0 auto;padding:0 24px;gap:0;min-width:max-content}
+.tab-btn{position:relative;padding:12px 18px;font-size:12px;font-weight:700;color:var(--gy);background:none;border:none;cursor:pointer;white-space:nowrap;transition:.15s;border-bottom:3px solid transparent;letter-spacing:.5px}
+.tab-btn:hover{color:var(--wh)}
+.tab-btn.active{color:var(--wh);border-bottom-color:var(--o)}
+.tab-btn .tab-check{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--gn);color:#000;font-size:9px;font-weight:900;margin-left:6px;opacity:0;transition:.2s}
+.tab-btn.done .tab-check{opacity:1}
+.tab-stage-color-0{border-bottom-color:transparent}
+.tab-btn.active[data-tab="overview"]{border-bottom-color:var(--o)}
+.tab-btn.active[data-tab="s01"]{border-bottom-color:var(--o)}
+.tab-btn.active[data-tab="s02"]{border-bottom-color:var(--bl)}
+.tab-btn.active[data-tab="s03"]{border-bottom-color:var(--gn)}
+.tab-btn.active[data-tab="s04"]{border-bottom-color:var(--yw)}
+.tab-btn.active[data-tab="s05"]{border-bottom-color:var(--pp)}
+.tab-btn.active[data-tab="appendix"]{border-bottom-color:var(--gy)}
+
+/* ── CONTENT PANELS ── */
+.panel{display:none;max-width:960px;margin:0 auto;padding:0 24px 80px}
+.panel.active{display:block}
+
+/* ── NAV BETWEEN TABS ── */
+.tab-nav{display:flex;justify-content:space-between;align-items:center;padding:32px 0 0;margin-top:40px;border-top:1px solid var(--bd)}
+.tab-nav-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;border:1px solid var(--bd);background:none;color:var(--gy)}
+.tab-nav-btn:hover{border-color:var(--o);color:var(--wh)}
+.tab-nav-btn.primary{background:var(--o);border-color:var(--o);color:var(--wh)}
+.tab-nav-btn.primary:hover{background:#e55a00}
+.tab-nav-btn:disabled{opacity:.3;cursor:default}
+
+/* ── HERO (overview only) ── */
+.hero{padding:60px 0 44px;text-align:center;border-bottom:3px solid var(--o);margin-bottom:0}
+.hero-tag{color:var(--o);font-size:12px;font-weight:700;letter-spacing:3px;margin-bottom:14px}
+.hero h1{font-size:clamp(22px,4vw,36px);font-weight:900;line-height:1.3;margin-bottom:14px}
+.hero h1 em{color:var(--o);font-style:normal}
+.hero p{color:var(--gy);font-size:14px;max-width:640px;margin:0 auto}
+
+/* ── OVERVIEW MAP ── */
+.overview-map{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:32px 0}
+.map-card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:20px;cursor:pointer;transition:.2s;text-align:left}
+.map-card:hover{border-color:var(--o);transform:translateY(-2px)}
+.map-card.done-card{border-color:rgba(0,200,150,.3);background:rgba(0,200,150,.04)}
+.map-card-stage{font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.map-card-title{font-size:14px;font-weight:900;margin-bottom:4px}
+.map-card-sub{color:var(--gy);font-size:11px;line-height:1.5}
+.map-card-status{margin-top:10px;font-size:10px;font-weight:700}
+.map-card-status.done{color:var(--gn)}
+.map-card-status.current{color:var(--o)}
+.map-card-status.locked{color:var(--gy)}
+
+/* ── STAGE HEADER ── */
+.stage-header{padding:44px 0 32px;border-bottom:1px solid var(--bd);margin-bottom:0}
+.stage-label{font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:4px}
+.stage-title{font-size:clamp(20px,3.5vw,30px);font-weight:900;line-height:1.2;margin-bottom:8px}
+.stage-desc{color:var(--gy);font-size:13px}
+.stage-q{background:rgba(255,255,255,.04);border-left:4px solid var(--o);border-radius:0 8px 8px 0;padding:10px 16px;margin:20px 0 0}
+.stage-q-label{color:var(--o);font-size:10px;font-weight:700;letter-spacing:2px;display:block;margin-bottom:3px}
+.stage-q-text{color:var(--wh);font-size:15px;font-weight:700}
+.stage-q-sub{color:var(--gy);font-size:12px;margin-top:3px}
+
+/* ── SECTION ── */
+.ch{padding:40px 0;border-bottom:1px solid var(--bd)}
+.ch-l{color:var(--o);font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:3px}
+.ch-t{font-size:clamp(17px,3vw,26px);font-weight:900;line-height:1.3;margin-bottom:3px}
+.ch-s{color:var(--gy);font-size:13px;margin-bottom:20px;font-style:italic}
+.s{margin:28px 0}
+.st{font-size:20px;font-weight:900;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--o);display:block}
+.st-num{color:var(--o);margin-right:8px;font-size:20px}
+.tx{margin:8px 0;color:#ccc;font-size:13px;line-height:1.9}
+.tx strong{color:var(--wh)}
+.src{color:var(--gy);font-size:10px;font-style:italic;margin:6px 0 10px;padding-left:10px;border-left:2px solid var(--bd)}
+
+/* ── GRID / CARD ── */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.cd{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:16px;transition:.2s}
+.cd:hover{border-color:var(--o)}
+.cd h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.cd p{color:#aaa;font-size:11px;line-height:1.7}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;margin:12px 0;border-radius:10px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead{background:#1A1A1A}
+th{padding:8px 10px;text-align:left;font-weight:700;color:var(--o);font-size:10px;letter-spacing:1px;border-bottom:2px solid var(--o);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--bd);color:#ccc;vertical-align:top}
+.tl{color:var(--wh);font-weight:600}
+
+/* ── FLOW ── */
+.fl{display:flex;align-items:stretch;gap:0;margin:14px 0;flex-wrap:wrap}
+.fs{flex:1;min-width:110px;padding:12px 8px;background:var(--cd);border:1px solid var(--bd);text-align:center;position:relative}
+.fs:first-child{border-radius:10px 0 0 10px}.fs:last-child{border-radius:0 10px 10px 0}
+.fs:not(:last-child)::after{content:'→';position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--o);font-size:15px;font-weight:900;z-index:1}
+.fn{color:var(--o);font-size:11px;font-weight:700;letter-spacing:1px}
+.fm{font-size:12px;font-weight:900;margin:2px 0}
+.fd{color:#aaa;font-size:10px;line-height:1.5}
+
+/* ── CALLOUT ── */
+.co{padding:12px 16px;border-radius:10px;margin:14px 0;font-size:12px;line-height:1.8}
+.co-k{background:rgba(255,102,0,.08);border:1px solid rgba(255,102,0,.3)}
+.co-k::before{content:'▶';color:var(--o);font-weight:700;margin-right:6px}
+.co-b{background:rgba(100,150,255,.06);border:1px solid rgba(100,150,255,.2)}
+.co-b::before{content:'💡';margin-right:4px;font-size:11px}
+.co-t{background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2)}
+.co-t::before{content:'✅';margin-right:4px;font-size:11px}
+.co-w{background:rgba(255,212,0,.05);border:1px solid rgba(255,212,0,.2)}
+.co-w::before{content:'⚠️';margin-right:4px;font-size:11px}
+.co-g{background:rgba(156,66,245,.06);border:1px solid rgba(156,66,245,.2)}
+.co-g::before{content:'📌';margin-right:4px;font-size:11px}
+
+/* ── WORKSHEET ── */
+.ws{background:#0D1117;border:1px solid #30363D;border-radius:10px;padding:16px;margin:14px 0;font-size:11px;color:#8B949E;line-height:1.7}
+.ws-title{display:block;color:var(--gn);font-weight:700;font-size:11px;letter-spacing:2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #30363D}
+.ws-section{color:var(--o);font-weight:700;font-size:10px;letter-spacing:1px;margin:10px 0 4px;display:block}
+.ws-row{display:flex;align-items:center;gap:8px;margin:4px 0}
+.ws-label{color:var(--wh);font-weight:600;font-size:11px;min-width:110px;flex-shrink:0}
+.ws-blank{flex:1;border-bottom:1px dashed #444;min-height:18px}
+
+/* ── ACCORDION ── */
+.acc{border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin:6px 0}
+.acc-h{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,.03);cursor:pointer;user-select:none;transition:.15s}
+.acc-h:hover{background:rgba(255,102,0,.08);border-left:3px solid var(--o)}
+.acc-h.open{background:rgba(255,102,0,.06);border-left:3px solid var(--o)}
+.acc-q{color:#e0e0e0;font-size:12px;font-weight:600;flex:1;line-height:1.5}
+.acc-q::before{content:'💬 ';font-size:11px}
+.acc-tag{color:var(--o);font-size:10px;white-space:nowrap;background:rgba(255,102,0,.1);padding:2px 6px;border-radius:4px;font-weight:600}
+.acc-arr{color:var(--o);font-size:13px;font-weight:900;transition:transform .2s;flex-shrink:0}
+.acc-h.open .acc-arr{transform:rotate(90deg)}
+.acc-body{display:none;padding:12px 16px 14px;border-top:1px solid rgba(255,102,0,.2);background:rgba(255,102,0,.03)}
+.acc-body.open{display:block}
+.acc-ans{color:#e8e8e8;font-size:12px;line-height:1.9;padding-left:16px;position:relative}
+.acc-ans::before{content:'→';position:absolute;left:0;font-weight:900;color:var(--o)}
+
+/* ── ENGINE ── */
+.eng{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
+.eng-s{padding:16px 10px;background:var(--cd);border-right:1px solid var(--bd);text-align:center;cursor:pointer;transition:.15s}
+.eng-s:last-child{border-right:none}
+.eng-s:hover{background:#252525}
+.eng-n{font-size:9px;font-weight:700;letter-spacing:1px;opacity:.8}
+.eng-t{font-size:13px;font-weight:900;margin:4px 0 2px}
+.eng-d{font-size:13px;font-weight:700;margin-top:2px}
+
+/* ── LOOKER STUDIO ── */
+.ls-wrap{background:#0D1117;border:1px solid #30363D;border-radius:10px;padding:14px;margin:12px 0}
+.ls-wrap-title{color:var(--bl);font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #30363D;display:block}
+.ls-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ls-pg{background:#111827;border:1px solid #1f2937;border-radius:6px;padding:10px 12px}
+.ls-n{font-size:9px;font-weight:700;letter-spacing:1px;margin-bottom:2px}
+.ls-t{font-size:11px;font-weight:700;color:var(--wh);margin-bottom:4px}
+.ls-d{font-size:10px;color:#888;line-height:1.6}
+.ls-a{font-size:10px;color:var(--o);margin-top:4px}
+
+/* ── BEFORE/AFTER ── */
+.cp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
+.cp-c{padding:14px}.cp-c:first-child{background:rgba(255,255,255,.03)}.cp-c:last-child{background:rgba(255,102,0,.04);border-left:2px solid var(--o)}
+.cp-c h4{font-size:12px;font-weight:700;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid var(--bd)}
+.cp-i{font-size:11px;color:#bbb;margin:3px 0;padding-left:10px;position:relative}.cp-i::before{content:'■';position:absolute;left:0;font-size:5px;top:4px}
+.cp-c:last-child .cp-i::before{color:var(--o)}
+
+/* ── CHECKLIST ── */
+.cl-g{color:var(--o);font-size:10px;font-weight:700;letter-spacing:2px;margin:12px 0 4px}
+.cl-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;color:#ccc}
+.cl-item:last-child{border-bottom:none}
+.cl-box{width:14px;height:14px;border:1px solid var(--o);border-radius:3px;flex-shrink:0;margin-top:2px}
+
+/* ── COMPLETE SCREEN ── */
+.complete-screen{text-align:center;padding:80px 24px}
+.complete-icon{font-size:64px;margin-bottom:20px}
+.complete-title{font-size:28px;font-weight:900;color:var(--o);margin-bottom:10px}
+.complete-sub{color:var(--gy);font-size:14px;line-height:1.8;max-width:480px;margin:0 auto 32px}
+.complete-checklist{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:24px;max-width:480px;margin:0 auto;text-align:left}
+.complete-checklist h3{font-size:13px;font-weight:700;color:var(--o);margin-bottom:12px;letter-spacing:1px}
+.complete-check-item{display:flex;gap:8px;padding:6px 0;font-size:12px;color:#ccc;border-bottom:1px solid rgba(255,255,255,.05)}
+.complete-check-item:last-child{border-bottom:none}
+.complete-check-item::before{content:'✓';color:var(--gn);font-weight:900;flex-shrink:0}
+.restart-btn{margin-top:24px;padding:10px 24px;background:none;border:1px solid var(--bd);border-radius:8px;color:var(--gy);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s}
+.restart-btn:hover{border-color:var(--o);color:var(--wh)}
+
+/* ── FOOTER ── */
+.footer{padding:36px 0;text-align:center;border-top:3px solid var(--o)}.footer p{color:var(--gy);font-size:11px}
+
+/* ── PD (orange divider title) ── */
+.pd{padding:36px 0;text-align:center;border-bottom:3px solid var(--o);border-top:3px solid var(--o);margin:0}
+.pd h2{font-size:clamp(16px,3vw,24px);font-weight:900;color:var(--o);margin-bottom:4px}
+.pd p{color:var(--gy);font-size:13px}
+
+@media(max-width:640px){
+  .fl{flex-direction:column}.fs{border-radius:8px!important}.fs:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-10px;transform:translateX(-50%)}
+  .cp{grid-template-columns:1fr}.cp-c:last-child{border-left:none;border-top:2px solid var(--o)}
+  .eng{grid-template-columns:1fr}.eng-s{border-right:none;border-bottom:1px solid var(--bd)}
+  .ls-grid{grid-template-columns:1fr}
+  .overview-map{grid-template-columns:1fr 1fr}
+  .tab-btn{padding:12px 12px;font-size:11px}
+}
+@media(max-width:480px){
+  .overview-map{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+<div class="nav-top">
+  <div class="nav-logo">underdogs.</div>
+  <div class="nav-progress">
+    <div class="nav-progress-bar"><div class="nav-progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="nav-progress-text" id="progressText">0 / 7 완료</div>
+  </div>
+</div>
+<div class="tab-bar">
+<div class="tab-list">
+  <button class="tab-btn active" data-tab="overview" onclick="goTab('overview')">📋 개요<span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s01" onclick="goTab('s01')">STAGE 01 <span style="color:var(--o)">진단</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s02" onclick="goTab('s02')">STAGE 02 <span style="color:var(--bl)">분석</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s03" onclick="goTab('s03')">STAGE 03 <span style="color:var(--gn)">설계</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s04" onclick="goTab('s04')">STAGE 04 <span style="color:var(--yw)">실행</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s05" onclick="goTab('s05')">STAGE 05 <span style="color:var(--pp)">확장</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="appendix" onclick="goTab('appendix')">APPENDIX<span class="tab-check">✓</span></button>
+</div>
+</div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     PANEL: OVERVIEW
+═══════════════════════════════════════ -->
+<div class="panel active" id="panel-overview">
+<section class="hero">
+<div class="hero-tag">AX CONSULTANT GUIDEBOOK — 사전학습</div>
+<h1><em>비즈니스 문제를 정의</em>하고<br>데이터로 구조를 만들고<br>실무자가 스스로 운영하게 한다</h1>
+<p>AX는 AI를 도입하는 것이 아니라, AI로 비즈니스 문제를 해결하는 것이다.<br>시스템이 아닌 프로세스 재설계. 외부 의존이 아닌 담당자 주도 전환.</p>
+</section>
+
+<section class="ch">
+<div class="ch-l">DEFINITION</div>
+<div class="ch-t">AX란 무엇인가</div>
+<div class="co co-k" style="font-size:14px;font-weight:700">AI가 단순한 도구가 아니라, 의사결정·프로세스·가치창출의 핵심 주체가 되도록 비즈니스 구조 자체를 재설계하는 것</div>
+<div class="tx">"AI를 쓴다"와 "AX를 한다"는 다르다.</div>
+<div class="tw"><table>
+<thead><tr><th></th><th>AI 도입</th><th>AX</th></tr></thead>
+<tbody>
+<tr><td class="tl">관점</td><td>도구 추가</td><td style="color:var(--o)">구조 재설계</td></tr>
+<tr><td class="tl">질문</td><td>"어떤 AI 툴을 쓸까?"</td><td style="color:var(--o)">"AI로 무엇을 바꿀까?"</td></tr>
+<tr><td class="tl">범위</td><td>특정 업무</td><td style="color:var(--o)">비즈니스 전체</td></tr>
+<tr><td class="tl">주체</td><td>담당자 개인</td><td style="color:var(--o)">프로세스·조직</td></tr>
+<tr><td class="tl">결과</td><td>효율 개선</td><td style="color:var(--o)">경쟁 구조 변화</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="ch">
+<div class="ch-l">AX VS DX</div>
+<div class="ch-t">기존 DX와 AX는 어떻게 다른가</div>
+<div class="ch-s">DX와 AX는 같은 선상의 진화가 아니라 층위가 다른 개념이다.</div>
+<div class="tw"><table>
+<thead><tr><th>비교 축</th><th>기존 DX</th><th>underdogs AX</th></tr></thead>
+<tbody>
+<tr><td class="tl">핵심 접근</td><td>시스템 도입 중심. ERP, CRM 패키지 구매·커스터마이징에 집중</td><td style="color:var(--o)"><strong>업무 프로세스 재설계.</strong> 비즈니스 문제를 정의하고, AI로 프로세스를 재구성</td></tr>
+<tr><td class="tl">핵심 질문</td><td>"어떻게 디지털로 전환할까?"</td><td style="color:var(--o)">"AI가 이 비즈니스의 무엇을 대체·강화·재설계할 수 있나?"</td></tr>
+<tr><td class="tl">주도 주체</td><td>외부 SI 업체 의존. 내부 역량 축적 불가</td><td style="color:var(--o)"><strong>실무 담당자 주도.</strong> 담당자가 직접 이해하고 운영할 수 있는 구조</td></tr>
+<tr><td class="tl">기술 활용</td><td>무겁고 경직된 레거시. 수정에 수개월, 수천만 원</td><td style="color:var(--o)"><strong>노코드/로코드 + AI 에이전트.</strong> 빠른 구축, 유연한 수정, 점진적 확장</td></tr>
+<tr><td class="tl">투자 규모</td><td>평균 1.5억 이상 (Big Bang)</td><td style="color:var(--o)"><strong>월 50~200만 원 (단계별).</strong> 성과를 확인하며 점진적으로 투자</td></tr>
+<tr><td class="tl">내재화율</td><td>현장 경험 기반 추정치로 낮은 편. 담당자 변경 시 시스템 방치 빈번</td><td style="color:var(--o)"><strong>80% 이상 목표.</strong> 담당자가 만들었기에 이해하고, 지속 개선</td></tr>
+<tr><td class="tl">성공 기준</td><td>시스템 구축 완료. "오픈했다"가 종료 기준</td><td style="color:var(--o)"><strong>비즈니스 지표 개선.</strong> 비용 절감, 매출 증대 등 실질적 성과로 측정</td></tr>
+</tbody></table></div>
+<div class="co co-k">DX를 완료한 기업도 AX는 처음부터 다시 설계해야 한다. DX 경험이 오히려 AX 저항의 원인이 되는 경우가 많다.</div>
+</section>
+
+<section class="ch">
+<div class="ch-l">PRINCIPLE</div>
+<div class="ch-t">AX 컨설팅 3가지 원칙</div>
+<div class="ch-s">아래는 AX의 정의가 아니라 underdogs의 AX 컨설팅 철학이다.</div>
+<div class="cg" style="grid-template-columns:repeat(3,1fr)">
+<div class="cd" style="border-top:3px solid var(--o)"><h4 style="color:var(--o);font-size:15px">원칙 1</h4><h4>문제는 기술이 아니라<br>접근 방식이다</h4><p style="margin-top:8px">DX가 실패하는 이유는 시스템 도입 자체가 목표가 되기 때문이다. "어떤 시스템을 쓸까"가 아니라 <strong>"어떤 병목을 풀까"</strong>가 먼저.</p></div>
+<div class="cd" style="border-top:3px solid var(--o)"><h4 style="color:var(--o);font-size:15px">원칙 2</h4><h4>복잡한 것을 복잡하게<br>풀면 실패한다</h4><p style="margin-top:8px">SKU 150개를 관리하는 시스템을 만드는 게 아니라 "150개가 왜 필요한지"를 묻는다. <strong>복잡성 자체가 비용이다.</strong></p></div>
+<div class="cd" style="border-top:3px solid var(--o)"><h4 style="color:var(--o);font-size:15px">원칙 3</h4><h4>담당자가 직접 운영할 수 있어야<br>진짜 전환이다</h4><p style="margin-top:8px">외부가 만들어준 시스템은 결국 방치된다. 실무자가 이해하고 운영할 수 있는 단순함으로 설계하고, <strong>떠나는 것이다.</strong></p></div>
+</div>
+</section>
+
+<section class="ch">
+<div class="ch-l">ROLE</div>
+<div class="ch-t">AX 컨설턴트의 역할 — 제작이 아닌 기획, 도구가 아닌 관점</div>
+<div class="cg" style="grid-template-columns:repeat(3,1fr)">
+<div class="cd"><h4 style="color:var(--o)">01. 인터뷰 및 기획</h4><p style="margin-top:6px">고객의 페인포인트를 끄집어내어 구조화된 문서로 가공하고, 해결 과제의 범위를 명확히 설정</p></div>
+<div class="cd"><h4 style="color:var(--o)">02. 프레임워크 기반 분석</h4><p style="margin-top:6px">AX 진단 도구(CTS, ERRC-X, VRIO 등)를 활용하여 논리와 데이터로 접근</p></div>
+<div class="cd"><h4 style="color:var(--o)">03. AI 도구 선별 및 조합</h4><p style="margin-top:6px">고객 상황에 맞는 가성비 높은 도구를 선별하여 워크플로우를 설계</p></div>
+</div>
+<div class="co co-b">AI를 가장 잘 쓰는 사람은 프롬프트를 잘 쓰는 사람이 아니라, 문제를 잘 구조화하는 사람이다. 그것이 AX 컨설턴트다.</div>
+</section>
+
+<section class="ch" style="border-bottom:none">
+<div class="ch-l">CORE ENGINE</div>
+<div class="ch-t">AX 5단계 엔진 — 학습 로드맵</div>
+<div class="ch-s">탭을 클릭해서 각 Stage를 순서대로 학습하세요.</div>
+<div class="eng">
+<div class="eng-s" style="border-top:4px solid var(--o)" onclick="goTab('s01')"><div class="eng-n" style="color:var(--o)">STAGE 01</div><div class="eng-t" style="color:var(--o)">DIAGNOSE</div><div class="eng-d" style="color:var(--wh);font-size:15px;margin-top:6px">진단</div><div style="color:#aaa;font-size:9px;margin-top:4px;line-height:1.4">현재 상태를 객관적으로 파악</div></div>
+<div class="eng-s" style="border-top:4px solid var(--bl)" onclick="goTab('s02')"><div class="eng-n" style="color:var(--bl)">STAGE 02</div><div class="eng-t" style="color:var(--bl)">ANALYZE</div><div class="eng-d" style="color:var(--wh);font-size:15px;margin-top:6px">분석</div><div style="color:#aaa;font-size:9px;margin-top:4px;line-height:1.4">근본 원인 파악, 핵심 과제 도출</div></div>
+<div class="eng-s" style="border-top:4px solid var(--gn)" onclick="goTab('s03')"><div class="eng-n" style="color:var(--gn)">STAGE 03</div><div class="eng-t" style="color:var(--gn)">DESIGN</div><div class="eng-d" style="color:var(--wh);font-size:15px;margin-top:6px">설계</div><div style="color:#aaa;font-size:9px;margin-top:4px;line-height:1.4">해결책 및 데이터 아키텍처</div></div>
+<div class="eng-s" style="border-top:4px solid var(--yw)" onclick="goTab('s04')"><div class="eng-n" style="color:var(--yw)">STAGE 04</div><div class="eng-t" style="color:var(--yw)">EXECUTE</div><div class="eng-d" style="color:var(--wh);font-size:15px;margin-top:6px">실행</div><div style="color:#aaa;font-size:9px;margin-top:4px;line-height:1.4">현장 적용 및 성과 측정</div></div>
+<div class="eng-s" style="border-top:4px solid var(--pp)" onclick="goTab('s05')"><div class="eng-n" style="color:var(--pp)">STAGE 05</div><div class="eng-t" style="color:var(--pp)">SCALE</div><div class="eng-d" style="color:var(--wh);font-size:15px;margin-top:6px">확장</div><div style="color:#aaa;font-size:9px;margin-top:4px;line-height:1.4">내재화 및 타 영역 확산</div></div>
+</div>
+<div class="tw"><table>
+<thead><tr><th>Stage</th><th>핵심 질문</th><th>핵심 목적</th><th>주요 활동</th><th>산출물 (Output)</th><th>→ 다음 단계 입력</th></tr></thead>
+<tbody>
+<tr><td class="tl" style="color:var(--o)">DIAGNOSE</td><td style="color:var(--gn)">지금 무슨 일이 일어나고 있나?</td><td>현재 상태를 객관적으로 수집·파악</td><td>4-Lens 시장 리서치, 인터뷰, KPI 스냅샷</td><td>종합 진단 리포트 (As-Is)</td><td>→ ANALYZE의 분석 대상</td></tr>
+<tr><td class="tl" style="color:var(--bl)">ANALYZE</td><td style="color:var(--gn)">왜 그 일이 일어나고 있나?</td><td>근본 원인 파악, 핵심 과제 도출</td><td>6대 병목 매핑, CTS 분석, Phase 판단</td><td>핵심 과제 정의서</td><td>→ DESIGN의 해결 대상</td></tr>
+<tr><td class="tl" style="color:var(--gn)">DESIGN</td><td style="color:var(--gn)">무엇을 어떻게 바꿀 것인가?</td><td>최적 해결책 및 데이터 아키텍처 설계</td><td>기초공사 확정, ERRC-X, AI 솔루션 매핑</td><td>To-Be 아키텍처 + 프로토타입</td><td>→ EXECUTE의 구축 목표</td></tr>
+<tr><td class="tl" style="color:var(--yw)">EXECUTE</td><td style="color:var(--gn)">설계가 현장에서 작동하는가?</td><td>설계된 솔루션을 현장에 적용·측정</td><td>수동→반자동→자동 전환, 대시보드·경보 구축</td><td>성과 대시보드 (ROI)</td><td>→ SCALE의 확장 근거</td></tr>
+<tr><td class="tl" style="color:var(--pp)">SCALE</td><td style="color:var(--gn)">담당자가 없어도 돌아가는가?</td><td>내재화 및 타 영역 확산</td><td>자립 기준 설정, 모듈 확장 가이드, 운영 매뉴얼화</td><td>운영 매뉴얼 + 확장 로드맵</td><td>→ 실무자가 다음 모듈 자립 추진</td></tr>
+</tbody></table></div>
+</section>
+
+<div class="tab-nav">
+<span></span>
+<button class="tab-nav-btn primary" onclick="goTab('s01')">STAGE 01 진단으로 →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: STAGE 01 DIAGNOSE
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-s01">
+<div class="pd"><h2>STAGE 01 — DIAGNOSE (진단)</h2><p>기업을 만나기 전에 시장을 파악하고, 현장에서 현재 상태를 객관적으로 확인한다</p></div>
+
+<section class="ch">
+<div class="ch-l">DIAGNOSE</div>
+<div class="ch-t">진단 — 현재 상태 파악</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">지금 무슨 일이 일어나고 있나?</div>
+<div class="stage-q-sub">판단하지 않는다. 현상을 수집하고 사실을 기록한다. 해석은 ANALYZE에서 한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.1</span>4-Lens 시장 리서치 — 미팅 전 준비</div>
+<div class="src">전략 컨설팅에서 일반적으로 사용하는 시장 분석 접근법(시장 구조, 경쟁자, 자사 포지셔닝, 환경 변화)을 AX 컨설팅 맥락에 맞게 underdogs가 재구성한 것이다.</div>
+<div class="tx">AI 2~3시간이면 채울 수 있다. <strong>"이 사람들 우리 시장 알고 왔네."</strong>가 첫인상.</div>
+<div class="cg" style="grid-template-columns:repeat(4,1fr)">
+<div class="cd" style="border-top:3px solid var(--o)"><h4 style="color:var(--o)">LENS 1<br>시장 구조</h4><p style="margin-top:6px">시장 규모·성장률. 채널 파워 쉬프트. 돈이 어디로 흐르나.</p></div>
+<div class="cd" style="border-top:3px solid var(--bl)"><h4 style="color:var(--bl)">LENS 2<br>상위 플레이어</h4><p style="margin-top:6px">상위 5~10개 브랜드. 채널 믹스, 가격대, 마케팅, 최근 행보. 공통 패턴.</p></div>
+<div class="cd" style="border-top:3px solid var(--gn)"><h4 style="color:var(--gn)">LENS 3<br>고객사의 위치</h4><p style="margin-top:6px">상위 브랜드 대비 가격·SKU·리뷰·인지도 갭. 리뷰 키워드 강점·약점.</p></div>
+<div class="cd" style="border-top:3px solid var(--yw)"><h4 style="color:var(--yw)">LENS 4<br>최근 변화</h4><p style="margin-top:6px">최근 6개월 변화. 플랫폼 정책, 소비자 행동, 비용 구조. 기회인가 위협인가.</p></div>
+</div>
+<div class="ws">
+<span class="ws-title">📋 &nbsp;4-LENS 브리핑 시트 — 기업 미팅 전 완료</span>
+<div class="ws-row"><span class="ws-label">고객사명</span><div class="ws-blank"></div></div>
+<div class="ws-row"><span class="ws-label">카테고리</span><div class="ws-blank"></div></div>
+<span class="ws-section">LENS 1 — 시장 구조</span>
+<div class="ws-row"><span class="ws-label">시장 규모/성장률</span><div class="ws-blank"></div></div>
+<div class="ws-row"><span class="ws-label">주도 채널</span><div class="ws-blank"></div><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">성장:</span><div class="ws-blank"></div><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">위축:</span><div class="ws-blank"></div></div>
+<span class="ws-section">LENS 2 — 상위 플레이어</span>
+<div class="ws-row"><span class="ws-label">상위 브랜드</span><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">1:</span><div class="ws-blank"></div><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">2:</span><div class="ws-blank"></div><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">3:</span><div class="ws-blank"></div></div>
+<div class="ws-row"><span class="ws-label">공통 패턴</span><div class="ws-blank"></div></div>
+<span class="ws-section">LENS 3 — 고객사 위치</span>
+<div class="ws-row"><span class="ws-label">상위 대비 갭</span><div class="ws-blank"></div></div>
+<div class="ws-row"><span class="ws-label">리뷰 키워드</span><span style="color:var(--gy);font-size:10px;white-space:nowrap">긍정:</span><div class="ws-blank"></div><span style="color:var(--gy);font-size:10px;white-space:nowrap;margin:0 6px">부정:</span><div class="ws-blank"></div></div>
+<span class="ws-section">LENS 4 — 최근 변화</span>
+<div class="ws-row"><span class="ws-label">기회 / 위협</span><div class="ws-blank"></div></div>
+<span class="ws-section">인터뷰 가설</span>
+<div class="ws-row"><span class="ws-label">가설 #1</span><div class="ws-blank"></div></div>
+<div class="ws-row"><span class="ws-label">가설 #2</span><div class="ws-blank"></div></div>
+</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.2</span>6대 구조적 병목 — 중소기업이 공통으로 겪는 문제</div>
+<div class="co co-b">DIAGNOSE 단계에서는 아래 6가지 병목의 현상을 정확히 확인하는 것이 중요하다. 원인 분석과 우선순위 판단은 ANALYZE에서 한다.</div>
+<div class="tw"><table>
+<thead><tr><th>#</th><th>구조 문제</th><th>현상</th><th>근본 원인</th><th>비즈니스 임팩트</th></tr></thead>
+<tbody>
+<tr><td style="color:var(--o);font-weight:700">01</td><td class="tl">데이터 파편화</td><td>부서별·개인별로 엑셀이 단절되어 존재</td><td>전사 데이터 파이프라인 부재</td><td>데이터 취합에 시간 낭비, 실시간 현황 파악 불가</td></tr>
+<tr><td style="color:var(--o);font-weight:700">02</td><td class="tl">복잡도 비용</td><td>제품/채널이 늘수록 관리 비용 급증</td><td>프로세스 표준화, 반복 업무 자동화 결여</td><td>매출이 성장해도 영업이익률은 오히려 하락</td></tr>
+<tr><td style="color:var(--o);font-weight:700">03</td><td class="tl">측정 부재</td><td>객관적 지표 없이 경험에 의존한 결정</td><td>실시간 성과 측정 대시보드 부재</td><td>리스크 예측 불가, 스케일업 한계</td></tr>
+<tr><td style="color:var(--o);font-weight:700">04</td><td class="tl">느린 의사결정</td><td>중요한 결정이 지연되고 타이밍을 놓침</td><td>데이터 취합 지연, 정보 신뢰성 부족</td><td>시장 변화에 대한 민첩성 상실</td></tr>
+<tr><td style="color:var(--o);font-weight:700">05</td><td class="tl">데이터 비자산화</td><td>핵심 인력 퇴사 시 노하우 증발</td><td>개인 PC 중심 업무, 지식 관리 시스템 부재</td><td>조직 학습 단절, 동일한 실수 반복</td></tr>
+<tr><td style="color:var(--o);font-weight:700">06</td><td class="tl">낮은 변화 실행력</td><td>새 시스템 도입해도 현장에 정착 안 됨</td><td>현업 플로우를 무시한 Top-down 도입</td><td>혁신 시도의 반복적 실패, 냉소주의</td></tr>
+</tbody></table></div>
+<div class="co co-k">이 6가지는 개별 문제가 아니라 서로 꼬리를 무는 구조적 악순환이다. 단편적인 툴 도입이 아닌 구조 전체를 바꾸는 접근이 필요하다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.3</span>밸류체인 KPI 스냅샷 — "이 숫자가 위험하다"</div>
+<div class="co co-b">KPI 스냅샷은 데이터를 수집하는 도구다. 수치의 의미를 해석하고 우선순위를 정하는 것은 ANALYZE에서 한다.</div>
+<div class="tw"><table>
+<thead><tr><th>KPI</th><th>계산</th><th>건강</th><th>위험</th></tr></thead>
+<tbody>
+<tr><td class="tl">SKU별 공헌이익</td><td>판매가 − (원가+물류+수수료+마케팅)</td><td style="color:var(--gn)">양수</td><td style="color:var(--rd)">음수 30%↑</td></tr>
+<tr><td class="tl">채널 공헌이익률</td><td>(채널매출−채널비용) ÷ 매출</td><td style="color:var(--gn)">15~30%</td><td style="color:var(--rd)">&lt;10%</td></tr>
+<tr><td class="tl">재고회전율</td><td>매출원가 ÷ 평균재고</td><td style="color:var(--gn)">6~12/년</td><td style="color:var(--rd)">&lt;4</td></tr>
+<tr><td class="tl">ROAS</td><td>광고매출 ÷ 광고비 × 100</td><td style="color:var(--gn)">300%+</td><td style="color:var(--rd)">&lt;200%</td></tr>
+<tr><td class="tl">LTV/CAC</td><td>생애가치 ÷ 획득비용</td><td style="color:var(--gn)">3배+</td><td style="color:var(--rd)">&lt;2배</td></tr>
+<tr><td class="tl">재구매율</td><td>재구매 ÷ 전체 × 100</td><td style="color:var(--gn)">25~40%</td><td style="color:var(--rd)">&lt;15%</td></tr>
+</tbody></table></div>
+<div class="co co-k"><strong>"미측정"이 가장 중요한 발견이다.</strong> 6개 중 4개 이상이 미측정이면 거의 모든 의사결정이 경험에만 의존하고 있다는 증거.</div>
+<div class="ws">
+<span class="ws-title">📋 &nbsp;KPI 스냅샷 — "미측정" 자체가 진단 결과</span>
+<div class="ws-row"><span class="ws-label">고객사명</span><div class="ws-blank"></div></div>
+<div style="margin-top:10px">
+<div class="ws-row"><span class="ws-label">SKU별 공헌이익</span><span style="color:var(--gy);font-size:11px;white-space:nowrap">□ 측정 중 (음수 SKU</span><div class="ws-blank" style="max-width:50px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">%) &nbsp; □ 미측정</span></div>
+<div class="ws-row" style="margin-top:6px"><span class="ws-label">채널 공헌이익률</span><span style="color:var(--gy);font-size:11px;white-space:nowrap">자사몰</span><div class="ws-blank" style="max-width:36px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">% / 쿠팡</span><div class="ws-blank" style="max-width:36px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">% / 네이버</span><div class="ws-blank" style="max-width:36px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">% &nbsp; □ 미측정</span></div>
+<div class="ws-row" style="margin-top:6px"><span class="ws-label">재고회전율</span><div class="ws-blank" style="max-width:60px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">회/년 &nbsp; □ 미측정</span></div>
+<div class="ws-row" style="margin-top:6px"><span class="ws-label">ROAS</span><div class="ws-blank" style="max-width:60px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">% &nbsp; □ 미측정</span></div>
+<div class="ws-row" style="margin-top:6px"><span class="ws-label">LTV/CAC</span><div class="ws-blank" style="max-width:60px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">배 &nbsp; □ 미측정</span></div>
+<div class="ws-row" style="margin-top:6px"><span class="ws-label">재구매율</span><div class="ws-blank" style="max-width:60px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">% &nbsp; □ 미측정</span></div>
+</div>
+<div style="margin-top:12px;padding-top:10px;border-top:1px solid #30363D">
+<div class="ws-row"><span class="ws-label">"미측정" 개수</span><div class="ws-blank" style="max-width:40px"></div><span style="color:var(--gy);font-size:11px;white-space:nowrap">개 / 6개 &nbsp; → 판단 근거 수준: &nbsp; □충분(0~1) &nbsp; □보통(2~3) &nbsp; □부족(4+)</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('overview')">← 개요</button>
+<button class="tab-nav-btn primary" onclick="goTab('s02')">STAGE 02 분석으로 →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: STAGE 02 ANALYZE
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-s02">
+<div class="pd"><h2>STAGE 02 — ANALYZE (분석)</h2><p>진단 데이터를 기반으로 근본 원인을 파악하고, 해결 우선순위를 결정한다</p></div>
+
+<section class="ch">
+<div class="ch-l">ANALYZE</div>
+<div class="ch-t">분석 — 근본 원인 파악</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">왜 그 일이 일어나고 있나?</div>
+<div class="stage-q-sub">DIAGNOSE에서 수집한 현상의 근본 원인을 파악한다. 무엇이 문제인지가 아니라 왜 그 문제가 생겼는지를 찾는다. 해결책은 DESIGN에서 만든다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.1</span>3 Phase 판단 — "이 기업은 지금 어디가 급한가"</div>
+<div class="tw"><table>
+<thead><tr><th>Phase</th><th>급한 기업의 신호</th><th>핵심 질문</th><th>분석 도구</th></tr></thead>
+<tbody>
+<tr><td class="tl">1. 비용 구조</td><td>공헌이익 미측정, 수기 2h+/일, 재고회전율 &lt;4</td><td style="color:var(--o)">"남는 게 없다" → 어디서 얼마나 새는가</td><td>CTS (숨은 비용 투시), 병목 해부</td></tr>
+<tr><td class="tl">2. 매출 성장</td><td>비용 안정, 재구매 &lt;15%, ROAS 하락</td><td style="color:var(--o)">"성장이 멈췄다" → 어떤 고객에게 어떤 가치를</td><td>ERRC-X (가치 재설계), RFM·LTV</td></tr>
+<tr><td class="tl">3. 성장동력</td><td>기존 사업 안정, 시장 포화, 데이터 미활용</td><td style="color:var(--o)">"다음이 없다" → 핵심 역량이 뭔가</td><td>VRIO (역량 스캔), 비즈니스 설계도</td></tr>
+</tbody></table></div>
+<div class="co co-k">비용을 줄여야 매출을 늘릴 여력이 생기고, 매출이 늘어야 성장에 투자할 수 있다. 3가지를 다 할 수 없다. Phase를 판단하고 하나에 집중한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.2</span>CTS 분석 — 숨은 비용을 숫자로 증명 (Phase 1)</div>
+<div class="co co-g">CTS(Cost-to-Serve)는 관리회계·공급망 분야에서 사용하는 원가 배분 개념을 AX 컨설팅 맥락에 맞게 underdogs가 적용한 것이다. 고객/채널/제품 축으로 실제 비용을 배분해서 진짜 수익성을 계산한다.</div>
+<div class="tw"><table>
+<thead><tr><th>항목</th><th>자사몰</th><th>쿠팡</th><th>네이버</th><th>올리브영</th></tr></thead>
+<tbody>
+<tr><td class="tl">매출</td><td>42억</td><td>36억</td><td>24억</td><td>18억</td></tr>
+<tr><td>(−) 원가 40%</td><td>−16.8</td><td>−14.4</td><td>−9.6</td><td>−7.2</td></tr>
+<tr><td>(−) 수수료</td><td>−1.3 (PG 3%)</td><td>−7.2 (20%)</td><td>−2.9 (12%)</td><td>−5.4 (30%)</td></tr>
+<tr><td>(−) 물류</td><td>−2.1</td><td>−1.8</td><td>−1.4</td><td>−0.5</td></tr>
+<tr><td>(−) 마케팅</td><td>−3.2</td><td>−2.0</td><td>−1.8</td><td>−0.6</td></tr>
+<tr><td class="tl">= 공헌이익</td><td style="color:var(--gn);font-weight:700">18.6 (44%)</td><td style="color:var(--gn);font-weight:700">10.6 (29%)</td><td style="color:var(--gn);font-weight:700">8.3 (35%)</td><td style="color:var(--rd);font-weight:700">4.3 (24%)</td></tr>
+</tbody></table></div>
+<div class="co co-k">발견: 올리브영 공헌이익률 24%로 최저. "브랜드 인지도 때문에 필요하다"는 맞을 수 있지만, 그 인지도의 대가가 연 14억의 최저 마진인지 숫자로 확인해야 한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.3</span>인터뷰 구조화 패턴 — 현장 언어를 데이터 구조로 바꾸기</div>
+<div class="tx">대표나 실무자가 하는 말을 구조적 문제로 연결하는 것이 AX 컨설턴트의 핵심 역량이다.</div>
+<div class="co co-b">"이 말이 나오면 이 문제다"를 몸에 익히는 것이 목표. 각 발언을 눌러서 구조적 해석을 확인하라.</div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"매출은 느는데 남는 게 없어요"</span><span class="acc-tag">측정 부재 #3 / Phase 1</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">SKU별·채널별 공헌이익 미측정. 전체 P&L만 보고 있어서 어디서 새는지 모른다. CTS 분석으로 적자 채널·제품 식별이 우선.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"우리 제품이 150개인데 다 관리하기 힘들어요"</span><span class="acc-tag">복잡도 비용 #2 / Phase 1</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">매출 80%는 상위 30개가 만든다. 나머지 120개의 재고+라인 전환+소량 발주 비용이 이익을 갉아먹고 있을 가능성 높음. 파레토 분석으로 정리 대상 식별.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"전부 자동화했으면 좋겠어요"</span><span class="acc-tag">측정 부재 #3</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">측정 없이 자동화부터 가면 잘못된 데이터를 빠르게 퍼뜨린다. 수동 기록(Step 1) → 기준선 확보 → 자동화 순서가 맞다.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"김 대리가 나가면 이거 아무도 못 해요"</span><span class="acc-tag">데이터 비자산화 #5</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">데이터 비자산화. 개인 PC와 머릿속에 묶인 지식을 에이전트 스펙 카드와 운영 매뉴얼로 꺼내서 시스템에 심어야 한다.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"엑셀 파일이 너무 많아서 어떤 게 최신인지 모르겠어요"</span><span class="acc-tag">데이터 파편화 #1</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">SSOT(Single Source of Truth) 부재. 데이터가 여러 곳에 흩어져 있으면 어떤 숫자도 신뢰할 수 없게 된다. 통합 데이터 소스 구축이 모든 것의 전제.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"보고서 만드는 데 하루가 걸려요"</span><span class="acc-tag">데이터 파편화 #1 / 복잡도 비용 #2</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">반복 수작업이 자동화되지 않은 상태. 데이터 취합→정리→시각화 전 과정이 수동이다. Before/After 프로세스 맵으로 자동화 범위를 먼저 정의.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"시스템 도입했는데 현장이 안 써요"</span><span class="acc-tag">낮은 변화 실행력 #6</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">낮은 변화 실행력의 전형. 실무자 플로우를 무시한 Top-down 도입이다. 실무자와 함께 Before/After를 설계하고 동의를 받는 과정이 빠진 것.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"대표님만 데이터 보시고, 우리는 잘 몰라요"</span><span class="acc-tag">느린 의사결정 #4</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">대표 의존형 의사결정 구조. 데이터가 특정인에게 집중되면 현장 판단 속도가 떨어지고 대표 병목이 생긴다. 대시보드와 경보를 현장 담당자 단위로 설계해야 한다.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"전에 ERP 도입하려다 포기했어요"</span><span class="acc-tag">낮은 변화 실행력 #6</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">변화 시도 실패 경험 → 조직 내 냉소주의 잠재. 큰 시스템보다 Quick Win 하나로 신뢰를 먼저 쌓아야 다음 변화가 가능하다.</div></div></div>
+<div class="acc"><div class="acc-h" onclick="toggle(this)"><span class="acc-q">"재고가 얼마나 있는지 정확히 몰라요"</span><span class="acc-tag">데이터 파편화 #1 / 측정 부재 #3</span><span class="acc-arr">▶</span></div><div class="acc-body"><div class="acc-ans">재고 SSOT 부재. 완제품 재고(운영팀 엑셀)와 원재료 재고(공장 엑셀)가 연결되지 않은 경우가 대부분. 품절→검색순위 하락→매출 손실로 이어지는 구조.</div></div></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.4</span>ERRC-X — AI 기반 가치 재설계 (Phase 2)</div>
+<div class="co co-g">ERRC-X는 김위찬·르네 마보안의 블루오션 전략(Blue Ocean Strategy, 2005)에서 제시한 ERRC 프레임워크(제거-축소-강화-창조)를 AI 실행 관점으로 underdogs가 재구성한 것이다.</div>
+<div class="tw"><table>
+<thead><tr><th>축</th><th>질문</th><th>예시</th><th>AI(X축) 실행 방법</th></tr></thead>
+<tbody>
+<tr><td class="tl" style="color:var(--rd)">제거</td><td>관행적이지만 가치 없는 것</td><td>회전율 30% 미만 SKU 80개 단종</td><td>자동 판별: AI가 "최근 90일 판매 0건, 재고 비용 月 ___만원" 리스트 자동 생성</td></tr>
+<tr><td class="tl" style="color:var(--yw)">축소</td><td>과도하게 제공되는 것</td><td>전 SKU 동일 패키징 → 상위 10개만 프리미엄</td><td>비용 시뮬레이션: "프리미엄 적용 시 절감액 ___원" 시나리오 자동 생성</td></tr>
+<tr><td class="tl" style="color:var(--gn)">강화</td><td>고객이 원하지만 부족한 것</td><td>성분 투명성·사용 후기 콘텐츠 강화</td><td>리뷰 분석: 전 채널 리뷰 수집 → 긍정/부정 키워드 추출 → 주간 리포트</td></tr>
+<tr><td class="tl" style="color:var(--bl)">신규</td><td>업계에 없는 새 가치</td><td>피부 타입별 루틴 추천</td><td>개인화 엔진: 구매 이력 + 설문 데이터 기반 AI 추천. 규칙 기반 → ML 전환</td></tr>
+</tbody></table></div>
+<div class="co co-k">ERRC-X에서 X(AI)는 "AI를 쓴다"가 아니라 "전략을 실행 가능하게 만드는 구체적 자동화"다. <strong>"어떤 데이터를 → 어떤 도구로 → 어떤 형태로 → 누가 보고 → 무엇을 판단하는가"</strong>까지 정의해야 AX다.</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s01')">← STAGE 01 진단</button>
+<button class="tab-nav-btn primary" onclick="goTab('s03')">STAGE 03 설계로 →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: STAGE 03 DESIGN
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-s03">
+<div class="pd"><h2>STAGE 03 — DESIGN (설계)</h2><p>분석 결과를 기반으로 기초공사를 확정하고, 데이터 아키텍처와 자동화 구조를 설계한다</p></div>
+
+<section class="ch">
+<div class="ch-l">DESIGN</div>
+<div class="ch-t">설계 — 해결책 및 아키텍처</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">무엇을 어떻게 바꿀 것인가?</div>
+<div class="stage-q-sub">ANALYZE에서 확정된 핵심 과제에 대한 해결책을 설계한다. 기초공사를 먼저 확정하고, 그 위에 무엇이 가능한지를 정의한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.1</span>기초공사 확정 — "이것이 되면 다음이 가능해진다"</div>
+<div class="tw"><table>
+<thead><tr><th>후보</th><th>임팩트</th><th>이것이 되면</th><th>판단</th></tr></thead>
+<tbody>
+<tr><td class="tl">① 채널·SKU 공헌이익 대시보드</td><td>경험→데이터 기반 전환</td><td>어떤 SKU를 정리하고 어떤 채널에 집중할지 근거. Phase 2 ERRC-X의 입력값.</td><td style="color:var(--o);font-weight:700">기초공사 #1</td></tr>
+<tr><td class="tl">② 주문 통합 자동화</td><td>3h/일→5min, 연 1,500만 절감</td><td>채널별 주문 데이터가 한 곳에 모여 ①의 데이터 소스가 된다.</td><td style="color:var(--o);font-weight:700">기초공사 #2</td></tr>
+<tr><td class="tl">③ SKU 구조조정 (150→50)</td><td>복잡도 비용 대폭 제거</td><td>①이 완료되어야 "어떤 SKU를 남길지" 근거가 생긴다.</td><td style="color:var(--gy)">①② 완료 후 실무자 추진</td></tr>
+</tbody></table></div>
+<div class="co co-t">②(주문 자동화) → ①(대시보드) 데이터 생성 → ③(SKU 구조조정) 근거 확보. 우리가 ①②를 깔아주면, 실무자가 ③을 스스로 판단하고 실행할 수 있다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.2</span>대시보드 설계 — Google Sheets + Looker Studio</div>
+<div class="fl">
+<div class="fs"><div class="fn">STEP 1</div><div class="fm">데이터 소스</div><div class="fd">Sheets 원천 데이터<br>자동 or 수동 수집</div></div>
+<div class="fs"><div class="fn">STEP 2</div><div class="fm">계산 레이어</div><div class="fd">공헌이익 공식 시트<br>수식 자동 계산</div></div>
+<div class="fs"><div class="fn">STEP 3</div><div class="fm">시각화</div><div class="fd">Looker Studio<br>실시간 대시보드</div></div>
+<div class="fs"><div class="fn">STEP 4</div><div class="fm">경보 연결</div><div class="fd">Apps Script<br>Slack 자동 알림</div></div>
+</div>
+<div class="ls-wrap">
+<span class="ls-wrap-title">📊 &nbsp;LOOKER STUDIO 페이지 구성</span>
+<div class="ls-grid">
+<div class="ls-pg"><div class="ls-n" style="color:var(--bl)">PAGE 1</div><div class="ls-t">전체 요약 — 30초 판단</div><div class="ls-d">총매출/공헌이익/이익률 스코어카드 · 채널별 공헌이익률 막대 · 적자 SKU 개수</div><div class="ls-a">→ 빨간 숫자 → P2 이동</div></div>
+<div class="ls-pg"><div class="ls-n" style="color:var(--bl)">PAGE 2</div><div class="ls-t">채널 드릴다운 — 어떤 채널이 문제인가</div><div class="ls-d">채널 드롭다운 · SKU별 공헌이익 히트맵(적자=빨간색) · 마케팅 효율</div><div class="ls-a">→ 적자 SKU 클릭 → P3 연결</div></div>
+<div class="ls-pg"><div class="ls-n" style="color:var(--bl)">PAGE 3</div><div class="ls-t">SKU 파레토 — 무엇을 정리할 것인가</div><div class="ls-d">A/B/C 등급별 매출/이익 파이차트 · C등급 리스트(단종 후보) · 절감 시뮬레이션</div></div>
+<div class="ls-pg"><div class="ls-n" style="color:var(--bl)">PAGE 4</div><div class="ls-t">주간/월간 추세 — 악화되고 있는가</div><div class="ls-d">공헌이익률 주간 추이 라인차트 · 전주 대비 급변 항목 자동 하이라이트</div><div class="ls-a">→ 악화 감지 시 드릴다운</div></div>
+</div>
+</div>
+<div class="co co-w"><strong>대시보드 ≠ 보고서.</strong> 보고서는 지난 일을 정리한다. 대시보드는 다음 행동을 유도한다. "매출 −8%"가 아니라 "매출 −8% → 원인: 쿠팡 프로모션 종료 → 액션: 자사몰 프로모션 검토 → 담당: 김OO"까지.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.3</span>도구 선택 의사결정 트리</div>
+<div class="tw"><table>
+<thead><tr><th>질문</th><th style="width:40px;text-align:center">→</th><th>도구 (YES인 경우)</th></tr></thead>
+<tbody>
+<tr><td>"트리거→액션이 1:1로 명확한가?"</td><td style="color:var(--gn);font-weight:900;text-align:center">YES</td><td style="color:var(--o);font-weight:600">Zapier/Make — 주문 수집, 경보 발송, 데이터 동기화</td></tr>
+<tr><td>"Google Sheets 안에서 끝나는가?"</td><td style="color:var(--gn);font-weight:900;text-align:center">YES</td><td style="color:var(--o);font-weight:600">Apps Script — 수식 자동화, 시트 간 이동, 메일 발송</td></tr>
+<tr><td>"텍스트를 읽고 판단/분류/생성해야 하는가?"</td><td style="color:var(--gn);font-weight:900;text-align:center">YES</td><td style="color:var(--o);font-weight:600">Claude API + Apps Script — CS 분류, 리포트 해석</td></tr>
+<tr><td>"Zapier/Make 월 비용 $100 넘어가는가?"</td><td style="color:var(--gn);font-weight:900;text-align:center">YES</td><td style="color:var(--o);font-weight:600">n8n 셀프호스팅으로 마이그레이션 검토</td></tr>
+</tbody></table></div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s02')">← STAGE 02 분석</button>
+<button class="tab-nav-btn primary" onclick="goTab('s04')">STAGE 04 실행으로 →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: STAGE 04 EXECUTE
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-s04">
+<div class="pd"><h2>STAGE 04 — EXECUTE (실행)</h2><p>설계된 솔루션을 현장에 적용한다. 기존 루틴을 유지하며 단계적으로 전환.</p></div>
+
+<section class="ch">
+<div class="ch-l">EXECUTE</div>
+<div class="ch-t">실행 — 현장 적용 및 성과 측정</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">설계가 현장에서 작동하는가?</div>
+<div class="stage-q-sub">완성된 솔루션을 한 번에 전환하지 않는다. 기존 루틴을 유지하며 단계적으로 전환한다. 현장이 적응하지 못하면 아무리 좋은 설계도 실패한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">4.1</span>수동 → 자동 전환 3단계</div>
+<div class="fl">
+<div class="fs"><div class="fn">STEP 1</div><div class="fm">수동+기록</div><div class="fd">기존대로 하되<br>로그 남김<br><span style="color:var(--o)">1~2주</span></div></div>
+<div class="fs"><div class="fn">STEP 2</div><div class="fm">반자동+검수</div><div class="fd">AI 초안 →<br>사람 확인 후 실행<br><span style="color:var(--o)">3~4주</span></div></div>
+<div class="fs"><div class="fn">STEP 3</div><div class="fm">자동+예외만 사람</div><div class="fd">정상 건 자동<br>이상 건만 판단<br><span style="color:var(--o)">5주~</span></div></div>
+</div>
+<div class="co co-w"><strong>Step 1 없이 Step 3으로 가면 실패한다.</strong> 2주간의 로그 데이터가 없으면 AI가 "정상"과 "이상"을 구분할 기준이 없다. 실무자의 판단을 If-Then 규칙으로 바꾸는 과정이 Step 1이다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">4.2</span>Before / After 프로세스 맵</div>
+<div class="cp">
+<div class="cp-c"><h4>❌ AS-IS (2시간 40분)</h4>
+<div class="cp-i">09:00 카페24 엑셀 다운 (15분)</div>
+<div class="cp-i">09:15 쿠팡 엑셀 다운 (15분)</div>
+<div class="cp-i">09:30 네이버 엑셀 다운 (10분)</div>
+<div class="cp-i">09:50 4개 양식 통일 (40분)</div>
+<div class="cp-i">10:30 3PL 발주 변환+발송 (30분)</div>
+<div class="cp-i">11:00 품절 체크+채널 처리 (40분)</div>
+<div class="cp-i" style="color:var(--rd);font-weight:700;margin-top:8px;padding-top:6px;border-top:1px solid var(--bd)">판단 10분 / 나머지 반복 수작업</div></div>
+<div class="cp-c"><h4>✅ TO-BE (23분)</h4>
+<div class="cp-i">09:00 Slack "247건 통합 완료" 확인 (1분)</div>
+<div class="cp-i">09:01 이상 주문 리스트 확인 (5분)</div>
+<div class="cp-i">09:06 이상 건 판단→승인/보류 (5분)</div>
+<div class="cp-i">09:11 3PL 자동 전송 로그 확인 (2분)</div>
+<div class="cp-i">09:13 품절 임박 SKU 경보→발주 판단 (10분)</div>
+<div class="cp-i" style="color:var(--o);margin-top:6px">판단 20분 / 2시간 17분 자동화</div></div>
+</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">4.3</span>경보 시스템 — 숫자가 다음 행동을 알려준다</div>
+<div class="tw"><table>
+<thead><tr><th>등급</th><th>트리거</th><th>즉시 행동</th></tr></thead>
+<tbody>
+<tr><td style="color:var(--rd);font-weight:700">🔴 긴급</td><td>상위 30 SKU 품절 / 일 주문 −30%</td><td>즉시 원인 확인+대응. 담당자 Slack 태그.</td></tr>
+<tr><td style="color:var(--yw);font-weight:700">🟡 주의</td><td>재고일수 60일↑ / ROAS 200%↓</td><td>주간 리뷰에서 검토. 대시보드 드릴다운.</td></tr>
+<tr><td style="color:var(--gy);font-weight:700">⚪ 정보</td><td>재구매 전환 / 리뷰 급증</td><td>모니터링. 추세 확인 후 판단.</td></tr>
+</tbody></table></div>
+<div class="co co-k"><strong>대시보드 + 경보는 세트다.</strong> 대시보드만 만들면 2주 후 아무도 안 본다. 경보가 Slack으로 와야 대시보드를 열게 된다.</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s03')">← STAGE 03 설계</button>
+<button class="tab-nav-btn primary" onclick="goTab('s05')">STAGE 05 확장으로 →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: STAGE 05 SCALE
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-s05">
+<div class="pd"><h2>STAGE 05 — SCALE (확장)</h2><p>에이전트 스펙 카드, 모듈 확장 가이드, 운영 매뉴얼화. 우리가 떠나기 위한 준비.</p></div>
+
+<section class="ch">
+<div class="ch-l">SCALE</div>
+<div class="ch-t">확장 — 내재화 및 자립</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">담당자가 없어도 돌아가는가?</div>
+<div class="stage-q-sub">컨설턴트가 떠난 후에도 시스템이 작동해야 한다. 이 단계의 목표는 확장이 아니라 자립이다. 자립이 확인된 후에 확장을 논한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.1</span>에이전트 스펙 카드 — 11항목으로 문서화</div>
+<div class="tx">돌아가는 모든 자동화·에이전트를 이 양식으로 문서화한다. 담당자가 바뀌어도 운영이 끊기지 않는다.</div>
+<div class="tw"><table>
+<thead><tr><th>항목</th><th>예시 (주문 이상 감지)</th></tr></thead>
+<tbody>
+<tr><td class="tl">Agent Name</td><td>주문 이상 감지 에이전트</td></tr>
+<tr><td class="tl">Purpose</td><td>일일 주문 중 대량주문·주소불일치·품절SKU 주문을 자동 감지</td></tr>
+<tr><td class="tl">Inputs</td><td>Google Sheets "통합주문" 탭 A:J열 (일일 갱신)</td></tr>
+<tr><td class="tl">Outputs</td><td>Slack #order-alert 채널에 이상 건 리스트 + Sheets 기록</td></tr>
+<tr><td class="tl">Decision Rules</td><td>IF 수량&gt;50 → 대량. IF 우편번호 불일치 → 주소오류. IF 재고=0 → 품절주문.</td></tr>
+<tr><td class="tl">Trigger</td><td>매일 08:55 (주문 수집 완료 후)</td></tr>
+<tr><td class="tl">Human Point</td><td>이상 건 리스트 → 담당자가 승인/보류/취소 결정</td></tr>
+<tr><td class="tl">Owner</td><td>운영팀 박OO</td></tr>
+<tr><td class="tl">Log</td><td>"자동화로그" 탭에 실행시간·처리건수·에러</td></tr>
+<tr><td class="tl">Failure</td><td>API 오류 시 5분 후 2회 재시도. 실패 시 팀장 Slack DM.</td></tr>
+<tr><td class="tl">Data Access</td><td>통합주문 탭 읽기 + 이상주문 탭 쓰기 (최소 권한)</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.2</span>모듈 확장 가이드 — 전제 조건이 핵심</div>
+<div class="tw"><table>
+<thead><tr><th>모듈</th><th>전제 조건</th><th>임팩트</th></tr></thead>
+<tbody>
+<tr><td class="tl">SKU 구조조정</td><td>공헌이익 대시보드 완성</td><td>복잡도 비용 대폭 제거</td></tr>
+<tr><td class="tl">마케팅 자동화 (RFM)</td><td>고객 데이터 SSOT + 재구매 데이터 3개월+</td><td>재구매율↑, CAC↓</td></tr>
+<tr><td class="tl">수요 예측</td><td>판매 데이터 6개월+ (주문 자동화로 수집)</td><td>재고 최적화, 품절↓</td></tr>
+<tr><td class="tl">CS 자동 분류</td><td>CS 로그 200건+ (수동 Step 1로 수집)</td><td>CS 처리 시간 −70%</td></tr>
+<tr><td class="tl">가격 최적화</td><td>공헌이익 대시보드 + 경쟁사 가격 데이터</td><td>마진↑, 경쟁력 유지</td></tr>
+</tbody></table></div>
+<div class="co co-k">기초공사에서 쌓인 데이터가 다음 모듈의 입력값이 된다. 공헌이익 대시보드 없이 SKU 구조조정은 근거가 없다. 우리가 깔아준 기초공사가 모듈 확장의 레일.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.3</span>자립 기준 설정 — "언제 우리가 빠질 수 있나"</div>
+<div class="tw"><table>
+<thead><tr><th>자립 기준 3가지 (모두 충족 시 개입 종료)</th><th>확인 방법</th></tr></thead>
+<tbody>
+<tr><td class="tl">담당자가 대시보드를 스스로 읽고 액션을 결정할 수 있다</td><td>1주일 컨설턴트 없이 운영 후 판단 오류 여부 확인</td></tr>
+<tr><td class="tl">에이전트 오류 발생 시 스스로 원인을 찾고 수정할 수 있다</td><td>의도적 오류 시뮬레이션 후 대응 시간 측정</td></tr>
+<tr><td class="tl">새 SKU·채널 추가 시 기존 구조에 스스로 반영할 수 있다</td><td>실제 신규 SKU 추가 실습 후 결과 검수</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.4</span>자립 실패 신호와 재개입 기준</div>
+<div class="tw"><table>
+<thead><tr><th>신호</th><th>의미</th><th>재개입 방식</th></tr></thead>
+<tbody>
+<tr><td class="tl">"어떻게 하는지 모르겠어요" 주 2회 이상</td><td>인수인계 불완전. 매뉴얼 보완 필요</td><td>매뉴얼 재작성 + 1:1 실습</td></tr>
+<tr><td class="tl">대시보드 데이터 2주 이상 갱신 안 됨</td><td>자동화 오류 or 담당자 포기</td><td>원인 진단 후 구조 단순화</td></tr>
+<tr><td class="tl">"기존 방식이 더 편해요" 발언</td><td>변화 실행력 붕괴</td><td>Quick Win 재설계, 불편함 원인 제거</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.5</span>실패 사례 라이브러리 — "이렇게 하면 안 된다"</div>
+<div class="tw"><table>
+<thead><tr><th>실패 패턴</th><th>증상</th><th>회피 방법</th></tr></thead>
+<tbody>
+<tr><td class="tl">측정 없이 자동화부터</td><td>자동화 구축했는데 "효과가 있는지 모르겠다". 잘못된 데이터를 빠르게 퍼뜨림.</td><td>Phase 판단 먼저. 2주 수동 기록(Step 1)이 기준선을 만든다.</td></tr>
+<tr><td class="tl">대시보드만 만들고 끝</td><td>2주 후 아무도 안 본다. 데이터도 갱신 안 됨.</td><td>대시보드 + 경보는 세트. 경보가 와야 대시보드를 열게 된다.</td></tr>
+<tr><td class="tl">한번에 다 바꾸려고</td><td>4가지 동시 착수 → 4주 후 하나도 완성 안 됨.</td><td>기초공사 최대 2개. 완성도 높은 2개가 미완성 5개보다 낫다.</td></tr>
+<tr><td class="tl">우리만 쓸 수 있는 구조</td><td>종료 1개월 후 "어떻게 수정해요?" 연락. 유지보수 대행 전락.</td><td>인수인계 3종 세트: 에이전트 스펙 카드 + 프롬프트 라이브러리 + 운영 매뉴얼.</td></tr>
+<tr><td class="tl">대표만 설득하고 끝</td><td>대표는 만족, 실무자는 안 쓴다. "기존이 더 편해요."</td><td>실무자와 함께 설계. Before/After를 같이 만들고 동의를 받는다.</td></tr>
+<tr><td class="tl">자립 기준 미설정</td><td>컨설팅 종료 조건이 없어 무한 의존 지속 또는 갑작스러운 계약 종료.</td><td>컨설팅 시작 전 자립 기준 3가지를 클라이언트와 서면으로 합의.</td></tr>
+<tr><td class="tl">AI 정확도 100% 기대</td><td>"AI가 틀려요" → 실패로 간주. 또는 검수 없이 그대로 실행.</td><td>85~95% 자동화, 나머지는 사람. 이 기대치를 킥오프에서 합의.</td></tr>
+<tr><td class="tl">데이터 문제를 프롬프트로 해결</td><td>AI 결과 이상한데 프롬프트만 한 달째 수정.</td><td>에러의 70%는 데이터 문제. 입력 형식 → 누락/변경 → 그래도 안 되면 프롬프트.</td></tr>
+</tbody></table></div>
+<div class="co co-b"><strong>실패 사례는 계속 추가한다.</strong> 프로젝트마다 "이번에 뭘 잘못했고, 다음에 어떻게 피하는가"를 기록한다. 이것이 쌓이면 underdogs AX의 진짜 자산.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.6</span>프로젝트 완료 체크리스트</div>
+<div class="co co-b">기초공사 완료 기준 — 모두 ✓ 되어야 인수인계 가능</div>
+<div class="ws">
+<span class="ws-title">📋 &nbsp;프로젝트 완료 체크리스트</span>
+<div class="cl-g">DIAGNOSE</div>
+<div class="cl-item"><div class="cl-box"></div>4-Lens 사전 리서치 완료</div>
+<div class="cl-item"><div class="cl-box"></div>인터뷰 기록 구조화 완료 (현장 발언 → 병목 태깅)</div>
+<div class="cl-item"><div class="cl-box"></div>6대 병목 태깅 + KPI 스냅샷 완료</div>
+<div class="cl-g">ANALYZE</div>
+<div class="cl-item"><div class="cl-box"></div>Phase 판단 + 근거 문서화</div>
+<div class="cl-item"><div class="cl-box"></div>CTS 분석 or ERRC-X or VRIO (Phase별 선택)</div>
+<div class="cl-g">DESIGN</div>
+<div class="cl-item"><div class="cl-box"></div>기초공사 확정 + 우선순위 근거</div>
+<div class="cl-item"><div class="cl-box"></div>대시보드 설계 (데이터 소스→계산→시각화→경보)</div>
+<div class="cl-g">EXECUTE</div>
+<div class="cl-item"><div class="cl-box"></div>SSOT 구축 (최소: 주문·매출·재고)</div>
+<div class="cl-item"><div class="cl-box"></div>핵심 KPI 대시보드 가동</div>
+<div class="cl-item"><div class="cl-box"></div>Quick Win 자동화 1개+ Step 3 진입</div>
+<div class="cl-item"><div class="cl-box"></div>경보 시스템 🔴 2개+ 설정</div>
+<div class="cl-g">SCALE</div>
+<div class="cl-item"><div class="cl-box"></div>에이전트 스펙 카드 전수 작성</div>
+<div class="cl-item"><div class="cl-box"></div>프롬프트 라이브러리 등록 + 버전 관리</div>
+<div class="cl-item"><div class="cl-box"></div>운영 매뉴얼 (주간 리듬 + 경보 대응 + 이슈 구분)</div>
+<div class="cl-item"><div class="cl-box"></div>모듈 확장 가이드 (전제 조건 명시)</div>
+<div class="cl-g">최종 테스트</div>
+<div class="cl-item"><div class="cl-box"></div>실무자가 대시보드를 보고 다음 행동을 스스로 판단할 수 있는가?</div>
+<div class="cl-item"><div class="cl-box"></div>경보→판단→행동 루프가 우리 없이 돌아가는가?</div>
+<div class="cl-item"><div class="cl-box"></div>다음 모듈을 붙이는 방법을 실무자가 알고 있는가?</div>
+</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s04')">← STAGE 04 실행</button>
+<button class="tab-nav-btn primary" onclick="goTab('appendix')">APPENDIX →</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PANEL: APPENDIX
+═══════════════════════════════════════ -->
+<div class="panel" id="panel-appendix">
+<div class="pd"><h2>APPENDIX</h2><p>업종별 적용 가이드 및 주요 용어 정리</p></div>
+
+<section class="ch">
+<div class="ch-l">APPENDIX A</div>
+<div class="ch-t">업종별 밸류체인·KPI·기초공사 변형</div>
+<div class="co co-b">업종이 달라도 패턴은 같다: ① 현장에서 체감하는 문제가 있다 → ② 숫자로 확인이 안 되어 있다 → ③ 측정 구조를 깔아준다 → ④ 숫자를 보고 실무자가 판단한다.</div>
+<div class="tw"><table>
+<thead><tr><th></th><th>소비재 커머스</th><th>B2B SaaS</th><th>서비스업</th><th>제조업</th></tr></thead>
+<tbody>
+<tr><td class="tl">Phase 1 KPI</td><td>SKU별 공헌이익<br>채널 공헌이익률<br>재고회전율</td><td>CAC / MRR<br>Churn Rate<br>Payback Period</td><td>프로젝트별 수익률<br>인건비율<br>가동률</td><td>제품별 원가율<br>공정 수율<br>납기 준수율</td></tr>
+<tr><td class="tl">기초공사</td><td>공헌이익 대시보드<br>주문 자동화</td><td>MRR·Churn 대시보드<br>이탈 고객 자동 태깅</td><td>프로젝트 수익 대시보드<br>시간 추적 자동화</td><td>공정별 수율 대시보드<br>불량 기록 자동화</td></tr>
+<tr><td class="tl">Quick Win</td><td>멀티채널 주문 통합<br>(2h40m→23min)</td><td>리드 스코어링 자동화<br>CRM 자동 입력</td><td>견적서 자동 생성<br>타임시트 자동 집계</td><td>수주→BOM 자동 변환<br>검수 결과 자동 기록</td></tr>
+</tbody></table></div>
+</section>
+
+<section class="ch" style="border-top:1px solid var(--bd)">
+<div class="ch-l">APPENDIX B</div>
+<div class="ch-t">주요 용어 정리</div>
+<div class="tw"><table>
+<thead><tr><th>용어</th><th>정의</th></tr></thead>
+<tbody>
+<tr><td class="tl">AX (AI Transformation)</td><td>AI가 의사결정·프로세스·가치창출의 핵심 주체가 되도록 비즈니스 구조를 재설계하는 것</td></tr>
+<tr><td class="tl">SSOT</td><td>Single Source of Truth. 모든 데이터가 하나의 출처에서 관리되는 상태. 데이터 파편화의 해결책.</td></tr>
+<tr><td class="tl">CTS (Cost-to-Serve)</td><td>채널·고객·제품별로 실제 비용을 배분해 진짜 수익성을 계산하는 분석 방법</td></tr>
+<tr><td class="tl">공헌이익</td><td>판매가에서 변동비(원가+물류+수수료+마케팅)를 뺀 값. 고정비 회수와 이익 기여분.</td></tr>
+<tr><td class="tl">ERRC-X</td><td>블루오션 전략의 ERRC(제거-축소-강화-창조) 프레임워크를 AI 실행 관점으로 재구성한 것</td></tr>
+<tr><td class="tl">Quick Win</td><td>빠르게 실행 가능하고 가시적 성과가 있으며 리스크가 낮은 첫 번째 파일럿 과제</td></tr>
+<tr><td class="tl">Human Point</td><td>자동화 프로세스 중 사람이 판단·개입해야 하는 지점. 자동화와 인간 판단의 경계.</td></tr>
+<tr><td class="tl">BOM (Bill of Materials)</td><td>제품을 만들기 위한 원재료·부품·수량 명세서</td></tr>
+<tr><td class="tl">RFM</td><td>Recency(최근 구매), Frequency(구매 빈도), Monetary(구매 금액)로 고객을 분류하는 분석</td></tr>
+<tr><td class="tl">VRIO</td><td>Value(가치), Rarity(희소성), Imitability(모방 가능성), Organization(조직화)으로 핵심 역량을 분석하는 프레임워크</td></tr>
+<tr><td class="tl">에이전트 스펙 카드</td><td>자동화·AI 에이전트의 목적·입력·출력·규칙·담당자 등을 11항목으로 문서화한 양식</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- COMPLETE SCREEN -->
+<div class="complete-screen" id="completeScreen" style="display:none">
+<div class="complete-icon">🎉</div>
+<div class="complete-title">사전학습 완료</div>
+<div class="complete-sub">AX 컨설턴트 가이드북 전 과정을 완료했습니다.<br>교육 당일 아래 내용을 떠올리며 참여하세요.</div>
+<div class="complete-checklist">
+<h3>교육 당일 체크포인트</h3>
+<div class="complete-check-item">AX와 DX의 차이를 본인 언어로 설명할 수 있다</div>
+<div class="complete-check-item">5단계 엔진과 각 단계의 핵심 질문을 안다</div>
+<div class="complete-check-item">6대 병목과 현장 발언의 연결 패턴을 이해했다</div>
+<div class="complete-check-item">기초공사 개념과 왜 순서가 중요한지 설명할 수 있다</div>
+<div class="complete-check-item">자립 기준과 실패 사례를 숙지했다</div>
+</div>
+<button class="restart-btn" onclick="restart()">처음부터 다시 보기</button>
+</div>
+
+<div class="tab-nav" id="appendixNav">
+<button class="tab-nav-btn" onclick="goTab('s05')">← STAGE 05 확장</button>
+<button class="tab-nav-btn primary" onclick="finish()">학습 완료 ✓</button>
+</div>
+</div>
+
+<div class="footer">
+<p>underdogs. | 비즈니스 문제를 정의하고, 데이터로 구조를 만들고, 우리가 없어도 돌아가는 기반을 깐다.</p>
+<p style="margin-top:6px">4-Lens는 전략 컨설팅 분야의 일반적 시장분석 접근법을 재구성 | ERRC-X는 블루오션 전략(Kim & Mauborgne, 2005)의 ERRC 프레임워크를 AI 실행 관점으로 재구성 | CTS는 관리회계·공급망 분야의 Cost-to-Serve 개념 적용 | 그 외 underdogs 독자 방법론</p>
+</div>
+
+<script>
+const TABS = ['overview','s01','s02','s03','s04','s05','appendix'];
+const STORE_KEY = 'ax_learn_done';
+
+function getDone(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); }catch(e){ return []; }
+}
+function markDone(tab){
+  var d=getDone(); if(!d.includes(tab)){d.push(tab);} localStorage.setItem(STORE_KEY,JSON.stringify(d));
+}
+function updateProgress(){
+  var d=getDone();
+  var pct=Math.round(d.length/TABS.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=d.length+' / '+TABS.length+' 완료';
+  TABS.forEach(function(t){
+    var btn=document.querySelector('[data-tab="'+t+'"]');
+    if(!btn) return;
+    if(d.includes(t)) btn.classList.add('done');
+    else btn.classList.remove('done');
+  });
+}
+function goTab(tab){
+  // hide all panels
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  // show target
+  var p=document.getElementById('panel-'+tab);
+  if(p){ p.classList.add('active'); }
+  // update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn=document.querySelector('[data-tab="'+tab+'"]');
+  if(btn){ btn.classList.add('active'); }
+  // mark done
+  markDone(tab);
+  updateProgress();
+  // scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggle(h){
+  h.classList.toggle('open');
+  h.nextElementSibling.classList.toggle('open');
+}
+function finish(){
+  markDone('appendix');
+  updateProgress();
+  document.getElementById('completeScreen').style.display='block';
+  document.getElementById('appendixNav').style.display='none';
+  document.getElementById('completeScreen').scrollIntoView({behavior:'smooth'});
+}
+function restart(){
+  localStorage.removeItem(STORE_KEY);
+  updateProgress();
+  goTab('overview');
+}
+// init
+updateProgress();
+</script>
+</body>
+</html>
