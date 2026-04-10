@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AX 시뮬레이션 — 그린팜 푸드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+*{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--o:#FF6600;--dk:#111;--gy:#888;--wh:#FFF;--cd:#1E1E1E;--bd:#333;--bl:#6496FF;--gn:#00C896;--rd:#FF4444;--yw:#FFD700;--pp:#9C42F5}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--dk);color:var(--wh);line-height:1.8;font-size:15px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(17,17,17,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd)}
+.nav-top{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;padding:10px 24px}
+.nav-logo{color:var(--o);font-weight:900;font-size:18px}
+.nav-progress{display:flex;align-items:center;gap:10px}
+.nav-progress-bar{width:140px;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
+.nav-progress-fill{height:100%;background:var(--o);border-radius:2px;transition:width .4s ease}
+.nav-progress-text{color:var(--gy);font-size:11px;white-space:nowrap}
+
+/* TAB BAR */
+.tab-bar{background:#161616;border-bottom:1px solid var(--bd);overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-list{display:flex;max-width:960px;margin:0 auto;padding:0 24px;min-width:max-content}
+.tab-btn{position:relative;padding:12px 16px;font-size:12px;font-weight:700;color:var(--gy);background:none;border:none;cursor:pointer;white-space:nowrap;transition:.15s;border-bottom:3px solid transparent;letter-spacing:.5px}
+.tab-btn:hover{color:var(--wh)}
+.tab-btn.active{color:var(--wh)}
+.tab-btn[data-tab="intro"].active{border-bottom-color:var(--o)}
+.tab-btn[data-tab="s01"].active{border-bottom-color:var(--o)}
+.tab-btn[data-tab="s02"].active{border-bottom-color:var(--bl)}
+.tab-btn[data-tab="s03"].active{border-bottom-color:var(--gn)}
+.tab-btn[data-tab="s04"].active{border-bottom-color:var(--yw)}
+.tab-btn[data-tab="s05"].active{border-bottom-color:var(--pp)}
+.tab-btn .tab-check{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--gn);color:#000;font-size:9px;font-weight:900;margin-left:6px;opacity:0;transition:.2s}
+.tab-btn.done .tab-check{opacity:1}
+
+/* PANELS */
+.panel{display:none;max-width:960px;margin:0 auto;padding:0 24px 80px}
+.panel.active{display:block}
+
+/* TAB NAV */
+.tab-nav{display:flex;justify-content:space-between;align-items:center;padding:32px 0 0;margin-top:40px;border-top:1px solid var(--bd)}
+.tab-nav-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;border:1px solid var(--bd);background:none;color:var(--gy);font-family:inherit}
+.tab-nav-btn:hover{border-color:var(--o);color:var(--wh)}
+.tab-nav-btn.primary{background:var(--o);border-color:var(--o);color:var(--wh)}
+.tab-nav-btn.primary:hover{background:#e55a00}
+
+/* HERO */
+.hero{padding:60px 0 44px;text-align:center;border-bottom:3px solid var(--o)}
+.hero-tag{color:var(--o);font-size:12px;font-weight:700;letter-spacing:3px;margin-bottom:14px}
+.hero h1{font-size:clamp(22px,4vw,36px);font-weight:900;line-height:1.3;margin-bottom:14px}
+.hero h1 em{color:var(--o);font-style:normal}
+.hero p{color:var(--gy);font-size:14px;max-width:640px;margin:0 auto}
+
+/* PD */
+.pd{padding:36px 0;text-align:center;border-bottom:3px solid var(--o);border-top:3px solid var(--o);margin:0}
+.pd h2{font-size:clamp(16px,3vw,24px);font-weight:900;color:var(--o);margin-bottom:4px}
+.pd p{color:var(--gy);font-size:13px}
+
+/* SECTION */
+.ch{padding:40px 0;border-bottom:1px solid var(--bd)}
+.ch-l{color:var(--o);font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:3px}
+.ch-t{font-size:clamp(17px,3vw,26px);font-weight:900;line-height:1.3;margin-bottom:3px}
+.ch-s{color:var(--gy);font-size:13px;margin-bottom:20px;font-style:italic}
+.s{margin:28px 0}
+.st{font-size:20px;font-weight:900;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--o);display:block}
+.st-num{color:var(--o);margin-right:8px;font-size:20px}
+.tx{margin:8px 0;color:#ccc;font-size:13px;line-height:1.9}
+.tx strong{color:var(--wh)}
+
+/* STAGE Q BOX */
+.stage-q{background:rgba(255,255,255,.04);border-left:4px solid var(--o);border-radius:0 8px 8px 0;padding:10px 16px;margin-bottom:20px}
+.stage-q-label{color:var(--o);font-size:10px;font-weight:700;letter-spacing:2px;display:block;margin-bottom:3px}
+.stage-q-text{color:var(--wh);font-size:15px;font-weight:700}
+.stage-q-sub{color:var(--gy);font-size:12px;margin-top:3px}
+
+/* CALLOUT */
+.co{padding:12px 16px;border-radius:10px;margin:14px 0;font-size:12px;line-height:1.8}
+.co-k{background:rgba(255,102,0,.08);border:1px solid rgba(255,102,0,.3)}
+.co-k::before{content:'▶';color:var(--o);font-weight:700;margin-right:6px}
+.co-b{background:rgba(100,150,255,.06);border:1px solid rgba(100,150,255,.2)}
+.co-b::before{content:'💡';margin-right:4px;font-size:11px}
+.co-t{background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.2)}
+.co-t::before{content:'✅';margin-right:4px;font-size:11px}
+.co-w{background:rgba(255,212,0,.05);border:1px solid rgba(255,212,0,.2)}
+.co-w::before{content:'⚠️';margin-right:4px;font-size:11px}
+.co-g{background:rgba(156,66,245,.06);border:1px solid rgba(156,66,245,.2)}
+.co-g::before{content:'📌';margin-right:4px;font-size:11px}
+.co-r{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2)}
+.co-r::before{content:'🔴';margin-right:4px;font-size:11px}
+
+/* TABLE */
+.tw{overflow-x:auto;margin:12px 0;border-radius:10px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead{background:#1A1A1A}
+th{padding:8px 10px;text-align:left;font-weight:700;color:var(--o);font-size:10px;letter-spacing:1px;border-bottom:2px solid var(--o);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--bd);color:#ccc;vertical-align:top}
+.tl{color:var(--wh);font-weight:600}
+
+/* GRID / CARD */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.cd{background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:16px;transition:.2s}
+.cd:hover{border-color:var(--o)}
+.cd h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.cd p{color:#aaa;font-size:11px;line-height:1.7}
+.info-row{display:flex;gap:6px;margin:4px 0;font-size:12px}
+.info-label{color:var(--o);font-weight:700;min-width:90px;flex-shrink:0}
+.info-val{color:#ccc}
+
+/* INTERVIEW ACCORDION */
+.acc{border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin:6px 0}
+.acc-h{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,.03);cursor:pointer;user-select:none;transition:.15s}
+.acc-h:hover{background:rgba(255,102,0,.08);border-left:3px solid var(--o)}
+.acc-h.open{background:rgba(255,102,0,.06);border-left:3px solid var(--o)}
+.acc-q{color:#e0e0e0;font-size:12px;font-weight:600;flex:1;line-height:1.5}
+.acc-q::before{content:'🎙️ ';font-size:11px}
+.acc-tag{color:var(--o);font-size:10px;white-space:nowrap;background:rgba(255,102,0,.1);padding:2px 6px;border-radius:4px;font-weight:600}
+.acc-arr{color:var(--o);font-size:13px;font-weight:900;transition:transform .2s;flex-shrink:0}
+.acc-h.open .acc-arr{transform:rotate(90deg)}
+.acc-body{display:none;padding:14px 16px;border-top:1px solid rgba(255,102,0,.2);background:rgba(0,0,0,.2)}
+.acc-body.open{display:block}
+.iv-q{color:var(--bl);font-size:12px;font-weight:600;margin:8px 0 3px;padding-left:18px;position:relative}
+.iv-q::before{content:'Q';position:absolute;left:0;color:var(--bl);font-weight:900;font-size:10px;top:2px}
+.iv-a{color:#bbb;font-size:11.5px;margin:3px 0 3px;padding-left:18px;position:relative;line-height:1.8}
+.iv-a::before{content:'A';position:absolute;left:0;color:var(--gy);font-weight:700;font-size:10px;top:2px}
+.iv-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin:0 2px}
+.iv-tag.fact{background:rgba(100,150,255,.15);color:var(--bl)}
+.iv-tag.pain{background:rgba(255,68,68,.15);color:var(--rd)}
+.iv-tag.cause{background:rgba(255,215,0,.15);color:var(--yw)}
+.iv-tag.wk{background:rgba(0,200,150,.15);color:var(--gn)}
+.iv-struct{background:rgba(255,102,0,.05);border-left:3px solid var(--o);padding:8px 12px;margin:8px 0;border-radius:0 6px 6px 0;font-size:11px;color:#ddd;line-height:1.7}
+.iv-struct-label{color:var(--o);font-size:9px;font-weight:700;letter-spacing:1px;display:block;margin-bottom:3px}
+
+/* BEFORE/AFTER */
+.cp{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:14px 0;border-radius:10px;overflow:hidden;border:1px solid var(--bd)}
+.cp-c{padding:14px}.cp-c:first-child{background:rgba(255,255,255,.03)}.cp-c:last-child{background:rgba(255,102,0,.04);border-left:2px solid var(--o)}
+.cp-c h4{font-size:12px;font-weight:700;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid var(--bd)}
+.cp-i{font-size:11px;color:#bbb;margin:3px 0;padding-left:10px;position:relative}.cp-i::before{content:'■';position:absolute;left:0;font-size:5px;top:4px}
+.cp-c:last-child .cp-i::before{color:var(--o)}
+
+/* FLOW */
+.fl{display:flex;align-items:stretch;gap:0;margin:14px 0;flex-wrap:wrap}
+.fs{flex:1;min-width:110px;padding:12px 8px;background:var(--cd);border:1px solid var(--bd);text-align:center;position:relative}
+.fs:first-child{border-radius:10px 0 0 10px}.fs:last-child{border-radius:0 10px 10px 0}
+.fs:not(:last-child)::after{content:'→';position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--o);font-size:15px;font-weight:900;z-index:1}
+.fn{color:var(--o);font-size:11px;font-weight:700;letter-spacing:1px}
+.fm{font-size:12px;font-weight:900;margin:2px 0}
+.fd{color:#aaa;font-size:10px;line-height:1.5}
+
+/* RECIPE CARD */
+.recipe{background:#0D1117;border:1px solid #30363D;border-radius:10px;padding:16px;margin:14px 0;font-size:11px;color:#8B949E}
+.recipe-title{color:var(--gn);font-weight:700;font-size:10px;letter-spacing:2px;display:block;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #30363D}
+.recipe-row{margin:4px 0;line-height:1.8}
+.recipe-key{color:var(--o);font-weight:700;min-width:80px;display:inline-block}
+.recipe-val{color:#ccc}
+
+/* ALERT BOX */
+.alert-grid{display:grid;gap:6px;margin:12px 0}
+.alert-item{display:flex;gap:10px;padding:10px 14px;border-radius:8px;font-size:11px;line-height:1.7;align-items:flex-start}
+.alert-item.red{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2)}
+.alert-item.yellow{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2)}
+.alert-item.white{background:rgba(255,255,255,.03);border:1px solid var(--bd)}
+.alert-emoji{font-size:14px;flex-shrink:0;margin-top:1px}
+.alert-text{color:#ccc}
+.alert-action{color:var(--o);font-weight:600}
+
+/* COMPLETE */
+.complete-screen{text-align:center;padding:80px 24px}
+.complete-icon{font-size:64px;margin-bottom:20px}
+.complete-title{font-size:28px;font-weight:900;color:var(--o);margin-bottom:10px}
+.complete-sub{color:var(--gy);font-size:14px;line-height:1.8;max-width:480px;margin:0 auto 32px}
+.complete-box{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:24px;max-width:480px;margin:0 auto;text-align:left}
+.complete-box h3{font-size:13px;font-weight:700;color:var(--o);margin-bottom:12px;letter-spacing:1px}
+.complete-item{display:flex;gap:8px;padding:6px 0;font-size:12px;color:#ccc;border-bottom:1px solid rgba(255,255,255,.05)}
+.complete-item:last-child{border-bottom:none}
+.complete-item::before{content:'✓';color:var(--gn);font-weight:900;flex-shrink:0}
+.restart-btn{margin-top:24px;padding:10px 24px;background:none;border:1px solid var(--bd);border-radius:8px;color:var(--gy);font-size:12px;cursor:pointer;font-family:inherit;transition:.15s}
+.restart-btn:hover{border-color:var(--o);color:var(--wh)}
+
+.footer{padding:36px 0;text-align:center;border-top:3px solid var(--o)}.footer p{color:var(--gy);font-size:11px}
+
+@media(max-width:640px){
+  .fl{flex-direction:column}.fs{border-radius:8px!important}.fs:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-10px;transform:translateX(-50%)}
+  .cp{grid-template-columns:1fr}.cp-c:last-child{border-left:none;border-top:2px solid var(--o)}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+<div class="nav-top">
+  <div class="nav-logo">underdogs.</div>
+  <div class="nav-progress">
+    <div class="nav-progress-bar"><div class="nav-progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="nav-progress-text" id="progressText">0 / 6 완료</div>
+  </div>
+</div>
+<div class="tab-bar">
+<div class="tab-list">
+  <button class="tab-btn active" data-tab="intro" onclick="goTab('intro')">📋 기업 프로필<span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s01" onclick="goTab('s01')">STAGE 01 <span style="color:var(--o)">진단</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s02" onclick="goTab('s02')">STAGE 02 <span style="color:var(--bl)">분석</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s03" onclick="goTab('s03')">STAGE 03 <span style="color:var(--gn)">설계</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s04" onclick="goTab('s04')">STAGE 04 <span style="color:var(--yw)">실행</span><span class="tab-check">✓</span></button>
+  <button class="tab-btn" data-tab="s05" onclick="goTab('s05')">STAGE 05 <span style="color:var(--pp)">확장</span><span class="tab-check">✓</span></button>
+</div>
+</div>
+</nav>
+
+<!-- ═══ INTRO ═══ -->
+<div class="panel active" id="panel-intro">
+<section class="hero">
+<div class="hero-tag">AX FULL SIMULATION SCENARIO</div>
+<h1><em>그린팜 푸드</em><br>제조+커머스 결합 기업<br>AX 컨설팅 전체 시뮬레이션</h1>
+<p>DIAGNOSE → ANALYZE → DESIGN → EXECUTE → SCALE<br>5단계 전 과정을 하나의 기업으로 처음부터 끝까지 따라간다.</p>
+</section>
+
+<section class="ch">
+<div class="ch-l">CLIENT PROFILE</div>
+<div class="ch-t">그린팜 푸드 — 기업 개요</div>
+<div class="ch-s">이 시뮬레이션을 읽기 전에 AX 가이드북의 5단계 엔진 개요를 먼저 숙지할 것.</div>
+
+<div class="cg" style="grid-template-columns:1fr 1fr">
+<div class="cd">
+<h4 style="color:var(--o);margin-bottom:10px">기본 정보</h4>
+<div class="info-row"><span class="info-label">업종</span><span class="info-val">건강기능식품 제조 + D2C 판매</span></div>
+<div class="info-row"><span class="info-label">설립</span><span class="info-val">2019년 (7년차)</span></div>
+<div class="info-row"><span class="info-label">매출</span><span class="info-val">연 82억 (전년 대비 +18%)</span></div>
+<div class="info-row"><span class="info-label">직원</span><span class="info-val">28명 (공장 12 / 사무실 16)</span></div>
+<div class="info-row"><span class="info-label">제품</span><span class="info-val">단백질바, 그래놀라, 프로틴쉐이크 등 SKU 87개</span></div>
+<div class="info-row"><span class="info-label">공장</span><span class="info-val">경기도 이천 (HACCP 인증, 자체 생산)</span></div>
+<div class="info-row"><span class="info-label">대표</span><span class="info-val">김정우 (38세, 식품공학 전공)</span></div>
+</div>
+<div class="cd">
+<h4 style="color:var(--o);margin-bottom:10px">채널 구조</h4>
+<div class="info-row"><span class="info-label">자사몰</span><span class="info-val">카페24 — 28억 (34%)</span></div>
+<div class="info-row"><span class="info-label">쿠팡</span><span class="info-val">로켓배송 — 24억 (29%)</span></div>
+<div class="info-row"><span class="info-label">네이버</span><span class="info-val">스마트스토어 — 14억 (17%)</span></div>
+<div class="info-row"><span class="info-label">올리브영</span><span class="info-val">오프라인 — 8억 (10%)</span></div>
+<div class="info-row"><span class="info-label">B2B</span><span class="info-val">기업납품 — 8억 (10%)</span></div>
+<div class="info-row" style="margin-top:10px"><span class="info-label">특이점</span><span class="info-val">자체 공장 제조 → 직접 판매. OEM 없음.</span></div>
+</div>
+</div>
+
+<div class="co co-k" style="font-size:14px;font-weight:700;margin-top:20px">
+대표의 요청: "매출 80억 넘었는데 남는 게 없어요"
+</div>
+<div class="co co-b">이 한 마디가 AX 컨설팅의 시작점이다. 가이드북 2.3 인터뷰 구조화 패턴과 연결해서 읽을 것.</div>
+</section>
+
+<div class="tab-nav">
+<span></span>
+<button class="tab-nav-btn primary" onclick="goTab('s01')">STAGE 01 진단으로 →</button>
+</div>
+</div>
+
+<!-- ═══ STAGE 01 DIAGNOSE ═══ -->
+<div class="panel" id="panel-s01">
+<div class="pd"><h2>STAGE 01 — DIAGNOSE (진단)</h2><p>미팅 전 리서치 + 현장 인터뷰 + 데이터 수집</p></div>
+
+<section class="ch">
+<div class="ch-l">DIAGNOSE</div>
+<div class="ch-t">진단 — 현재 상태 파악</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">지금 무슨 일이 일어나고 있나?</div>
+<div class="stage-q-sub">판단하지 않는다. 현상을 수집하고 사실을 기록한다. 해석은 ANALYZE에서 한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.1</span>4-Lens 사전 리서치 — 미팅 2일 전, AI 2.5시간</div>
+<div class="co co-b">가이드북 1.1과 동일한 프레임워크 적용. 미팅 전 이 시트를 완성하면 "이 사람들 우리 시장 알고 왔네."가 첫인상이 된다.</div>
+<div class="tw"><table>
+<thead><tr><th>Lens</th><th>리서치 결과</th><th>인터뷰 가설</th></tr></thead>
+<tbody>
+<tr><td class="tl" style="color:var(--o)">LENS 1<br>시장 구조</td><td>건강기능식품 시장 6.2조(+8.7%). 프로틴 카테고리 +23%. 쿠팡 건기식 +41%. 자사몰 D2C 브랜드 급증하지만 CAC 상승 추세.</td><td style="color:var(--gn)">"쿠팡 성장에 올라탔을 텐데, 수수료+물류비 부담이 커졌을 것"</td></tr>
+<tr><td class="tl" style="color:var(--bl)">LENS 2<br>상위 플레이어</td><td>마이프로틴 SKU 200+, 핏펫 SKU 42, 랩노쉬 SKU 35. 공통: 히어로 SKU 5개 이하에 집중, 자사몰 비중 40%↑. 핏펫은 구독 모델로 재구매율 38%.</td><td style="color:var(--gn)">"그린팜 SKU 87개는 상위 대비 2배 이상. 히어로 제품 전략 부재 가능성"</td></tr>
+<tr><td class="tl" style="color:var(--gn)">LENS 3<br>고객사 위치</td><td>쿠팡 리뷰 3,400개(상위 1/3). 네이버 검색 월 1,800(랩노쉬 1/8). 별점 4.5(양호). 자사몰 재구매율 불명.</td><td style="color:var(--gn)">"인지도 대비 자사몰 전환이 약할 것. 재구매 구조가 없을 가능성"</td></tr>
+<tr><td class="tl" style="color:var(--yw)">LENS 4<br>최근 변화</td><td>쿠팡 수수료 12→15%. 식약처 건기식 표시광고 규제 강화. 원재료(유청단백) 가격 +12%.</td><td style="color:var(--gn)">"원가 상승 + 수수료 인상이 마진을 양쪽에서 압박하고 있을 것"</td></tr>
+</tbody></table></div>
+<div class="co co-k">첫 미팅 오프닝: "요즘 유청단백 원가가 12% 올랐는데, 쿠팡 수수료도 15%까지 올라갔더라고요. 마진 체감이 꽤 다르실 것 같은데, 실제로 어떠세요?"</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.2</span>현장 인터뷰 구조화 — 대표·실무자·공장장</div>
+<div class="co co-b">가이드북 2.3의 인터뷰 구조화 패턴을 실제 현장에 적용한 결과다. 각 발언 아래 구조화 해석을 직접 확인하라.</div>
+
+<div class="acc">
+<div class="acc-h" onclick="toggle(this)"><span class="acc-q">대표 김정우 — 전체 사업 현황 (90분)</span><span class="acc-tag">6개 병목 전수 발견</span><span class="acc-arr">▶</span></div>
+<div class="acc-body">
+<div class="iv-q">"매출은 80억이 넘었는데, 남는 게 없다고 하셨는데 좀 더 구체적으로?" <span class="iv-tag fact">FACT</span><span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"작년에 82억 찍었는데, 영업이익이 한 3억 정도? 이익률이 4%도 안 돼요. 2년 전엔 매출 55억에 이익이 4억이었거든요. 매출은 50% 늘었는데 이익은 줄었어요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>매출 55억→82억(+49%), 영업이익 4억→3억(−25%). 이익률 7.3%→3.7%. 매출 성장이 수익성을 갉아먹는 구조. → <strong>복잡도 비용 (#2), 측정 부재 (#3)</strong></div>
+
+<div class="iv-q">"어디서 비용이 새는 것 같으세요?" <span class="iv-tag cause">CAUSE</span><span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"솔직히 정확히 모르겠어요. 쿠팡이 커지면서 수수료가 확 늘었고, 물류비도 올랐고... 근데 채널별로 정확히 얼마 남는지는 계산해본 적 없어요. 전체 매출에서 전체 비용 빼는 수준이에요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>채널별 공헌이익 미측정. 전체 P&L만 있고 채널/SKU별 수익성 분석 부재. → <strong>측정 부재 (#3), 데이터 파편화 (#1)</strong></div>
+
+<div class="iv-q">"SKU가 87개던데, 어떻게 이렇게 많아졌어요?" <span class="iv-tag cause">CAUSE</span></div>
+<div class="iv-a">"처음엔 프로틴바 3종으로 시작했는데, 고객이 맛 다양화를 원하니까 늘리고, 쿠팡에서 번들 상품을 요구하니까 또 늘리고, 올리브영 전용 사이즈 만들고... 지금은 어떤 게 잘 팔리고 어떤 게 재고만 쌓이는지 한눈에 안 보여요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>SKU 증가 원인이 전략적 판단이 아닌 채널별 요구 대응. SKU별 수익성 미측정 상태에서 관성적으로 증가. → <strong>복잡도 비용 (#2)</strong></div>
+
+<div class="iv-q">"공장 쪽은 어떤 상황인가요?" <span class="iv-tag fact">FACT</span><span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"공장이 가장 골치예요. SKU가 87개니까 라인 전환이 하루에 3~4번이에요. 전환할 때마다 30분~1시간 세척하고 세팅하는데, 한 달이면 50시간은 되거든요. 소량 생산 SKU가 많아서 원재료를 소량 발주하게 되고, 단가도 올라가요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>라인 전환 50h/월 = 인건비 약 150만원/월 + 기회비용(생산 가능 제품). 소량 발주 → 원재료 단가 상승. "매출은 느는데 남는 게 없다"의 숨은 원인. → <strong>복잡도 비용 (#2)</strong></div>
+
+<div class="iv-q">"주문 관리는 어떻게 하세요?" <span class="iv-tag wk">WORKAROUND</span></div>
+<div class="iv-a">"이 대리가 매일 아침 카페24, 쿠팡, 네이버, 올리브영 발주서 다 취합해서 엑셀로 정리해요. 3시간은 걸리죠. 그 엑셀을 공장에 보내면 공장장이 생산 계획을 짜는데, 또 수기로 해요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>주문 취합 3h/일 × 22일 = 66h/월. 수기 생산 계획. 채널별 데이터 분리로 통합 뷰 없음. → <strong>데이터 파편화 (#1), 느린 의사결정 (#4)</strong></div>
+
+<div class="iv-q">"재고 관리는요?" <span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"완제품 재고는 이 대리 엑셀이에요. 원재료 재고는 공장 김 주임이 별도 엑셀로 관리하고. 둘이 맞춰본 적은... 분기에 한 번 정도? 가끔 쿠팡에서 주문 터지면 재고가 없어서 품절 걸리고, 그러면 검색 순위 떨어지고..."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>완제품 재고(이 대리 엑셀) ↔ 원재료 재고(공장 김 주임 엑셀) = SSOT 부재. 품절 → 쿠팡 검색순위 하락 → 매출 손실. → <strong>데이터 파편화 (#1), 데이터 비자산화 (#5)</strong></div>
+</div>
+</div>
+
+<div class="acc">
+<div class="acc-h" onclick="toggle(this)"><span class="acc-q">이 대리 — 운영팀 주문/재고 담당</span><span class="acc-tag">반복 수작업 3.5h/일</span><span class="acc-arr">▶</span></div>
+<div class="acc-body">
+<div class="iv-q">"매일 아침 루틴이 어떻게 되세요?" <span class="iv-tag fact">FACT</span><span class="iv-tag wk">WORKAROUND</span></div>
+<div class="iv-a">"8시 반에 출근하면 카페24 엑셀 뽑고, 쿠팡 Wing 뽑고, 네이버 커머스 뽑고, 올리브영 이메일 확인하고. 네 개 양식이 다 달라서 통일하는 데만 1시간 넘게 걸려요. 그 다음에 물류사 발주서 변환해서 보내고, 품절 처리하고... 점심 전에 겨우 끝나요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>주문 취합+양식 통일+발주 변환+품절 처리 = 약 3.5h/일. 이 중 판단이 필요한 시간은 약 15분. 나머지 3시간 15분은 반복 수작업. → <strong>데이터 파편화 (#1), 복잡도 비용 (#2)</strong></div>
+
+<div class="iv-q">"B2B 납품은 어떻게 관리하세요?" <span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"그건 박 과장이 따로 해요. 저는 잘 몰라요. 박 과장 PC에 있을 거예요. 가끔 B2B 물량이랑 D2C 물량이 겹쳐서 공장에서 뭘 먼저 생산해야 하는지 헷갈릴 때가 있어요. 그때는 대표님한테 물어봐요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>B2B와 D2C 데이터 완전 분리. 생산 우선순위 판단이 대표에게 집중 → 의사결정 병목. → <strong>데이터 파편화 (#1), 느린 의사결정 (#4)</strong></div>
+</div>
+</div>
+
+<div class="acc">
+<div class="acc-h" onclick="toggle(this)"><span class="acc-q">공장장 최 부장 — 생산/원재료 담당</span><span class="acc-tag">긴급 발주 연 2,400만 추가 지출</span><span class="acc-arr">▶</span></div>
+<div class="acc-body">
+<div class="iv-q">"생산 계획은 어떻게 세우세요?" <span class="iv-tag fact">FACT</span></div>
+<div class="iv-a">"이 대리가 엑셀 보내주면 그거 보고 저녁에 다음 날 생산 계획을 짜요. SKU가 많으니까 라인 전환이 문제예요. 프로틴바 → 그래놀라 → 쉐이크 이렇게 바꿀 때마다 세척하고 설정 바꾸는 데 40분은 걸려요. 하루에 3~4번 바꾸니까 2시간 넘게 허비해요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>라인 전환 40분 × 3.5회/일 × 22일 = 약 51h/월. 시간당 인건비 3만원 기준 153만원/월 + 생산량 감소 기회비용 추정 월 2,000만원.</div>
+
+<div class="iv-q">"원재료 발주는 어떻게?" <span class="iv-tag fact">FACT</span><span class="iv-tag pain">PAIN</span></div>
+<div class="iv-a">"한 달에 한 번 몰아서 발주하는데, 갑자기 매출 터지면 긴급 발주를 넣어야 해요. 긴급 발주는 단가가 10~15% 비싸요. 올해만 긴급 발주가 8번이었어요."</div>
+<div class="iv-struct"><span class="iv-struct-label">구조화</span>긴급 발주 8회/년 × 평균 300만원 추가 비용 = 연 2,400만원 추가 지출. 수요 예측 부재가 원인. → <strong>복잡도 비용 (#2), 측정 부재 (#3)</strong></div>
+</div>
+</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">1.3</span>KPI 스냅샷 — 수집된 데이터</div>
+<div class="co co-b">가이드북 1.3의 KPI 스냅샷 프레임워크 적용. "미측정" 자체가 진단 결과다.</div>
+<div class="tw"><table>
+<thead><tr><th>KPI</th><th>현황</th><th>건강 기준</th><th>판정</th></tr></thead>
+<tbody>
+<tr><td class="tl">SKU별 공헌이익</td><td style="color:var(--rd);font-weight:700">미측정</td><td>양수</td><td style="color:var(--rd);font-weight:700">🔴 미측정</td></tr>
+<tr><td class="tl">채널 공헌이익률</td><td style="color:var(--rd);font-weight:700">미측정 (전체 이익률 3.7%만 파악)</td><td>15~30%</td><td style="color:var(--rd);font-weight:700">🔴 미측정</td></tr>
+<tr><td class="tl">재고회전율</td><td>추정 3.2회/년 (완제품 엑셀 기준, 정확도 낮음)</td><td>6~12/년</td><td style="color:var(--rd);font-weight:700">🔴 위험</td></tr>
+<tr><td class="tl">ROAS</td><td style="color:var(--rd);font-weight:700">미측정 (총 마케팅비 연 12억, 채널별 미분리)</td><td>300%+</td><td style="color:var(--rd);font-weight:700">🔴 미측정</td></tr>
+<tr><td class="tl">재구매율</td><td>자사몰 추정 18% (정확한 수치 미확인)</td><td>25~40%</td><td style="color:var(--yw);font-weight:700">🟡 주의</td></tr>
+<tr><td class="tl">공정 수율</td><td style="color:var(--rd);font-weight:700">미측정 ("좋은 편"이라고만 인지)</td><td>95%+</td><td style="color:var(--rd);font-weight:700">🔴 미측정</td></tr>
+<tr><td class="tl">라인 전환 시간</td><td>약 51h/월 (인터뷰 추정)</td><td>20h 이하</td><td style="color:var(--rd);font-weight:700">🔴 위험</td></tr>
+</tbody></table></div>
+<div class="co co-k">7개 중 4개가 미측정. 측정되는 것도 "추정" 수준. 거의 모든 의사결정이 경험에 의존하고 있다. → <strong>전형적인 Phase 1 기업.</strong></div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('intro')">← 기업 프로필</button>
+<button class="tab-nav-btn primary" onclick="goTab('s02')">STAGE 02 분석으로 →</button>
+</div>
+</div>
+
+<!-- ═══ STAGE 02 ANALYZE ═══ -->
+<div class="panel" id="panel-s02">
+<div class="pd"><h2>STAGE 02 — ANALYZE (분석)</h2><p>진단 데이터를 기반으로 근본 원인 분석 + Phase 판단 + 우선순위 도출</p></div>
+
+<section class="ch">
+<div class="ch-l">ANALYZE</div>
+<div class="ch-t">분석 — 근본 원인 파악</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">왜 그 일이 일어나고 있나?</div>
+<div class="stage-q-sub">DIAGNOSE에서 수집한 현상의 근본 원인을 파악한다. 해결책은 DESIGN에서 만든다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.1</span>6대 병목 매핑 — 그린팜 증거와 비용 임팩트</div>
+<div class="co co-b">가이드북 1.2의 6대 병목 프레임워크를 그린팜에 적용. 각 병목이 얼마의 비용을 만드는지 숫자로 연결한다.</div>
+<div class="tw"><table>
+<thead><tr><th>병목</th><th>그린팜 증거</th><th>추정 비용 임팩트</th></tr></thead>
+<tbody>
+<tr><td class="tl" style="color:var(--rd)">① 데이터 파편화</td><td>이 대리 엑셀(주문+완제품재고) / 공장 김 주임 엑셀(원재료) / 박 과장 PC(B2B) / 대표 머릿속(의사결정)</td><td>통합 뷰 부재로 품절 발생 → 쿠팡 검색순위 하락, 연 추정 매출 손실 5,000만원+</td></tr>
+<tr><td class="tl" style="color:var(--rd)">② 복잡도 비용</td><td>SKU 87개(상위 대비 2배+). 라인 전환 51h/월. 소량 발주로 원재료 단가↑. 채널별 전용 SKU.</td><td>라인 전환 비용 153만/월 + 기회비용 2,000만/월 + 긴급 발주 2,400만/년</td></tr>
+<tr><td class="tl" style="color:var(--rd)">③ 측정 부재</td><td>채널별/SKU별 공헌이익 미측정. ROAS 미측정. 공정 수율 미측정.</td><td>"남는 게 없다"는 알지만 "어디서 얼마나"는 모른다 → 모든 판단 근거 부재</td></tr>
+<tr><td class="tl" style="color:var(--o)">④ 느린 의사결정</td><td>생산 우선순위를 대표가 결정. 이 대리→대표→공장장 커뮤니케이션 병목.</td><td>판단 지연으로 긴급 생산 빈발, 야근 비용</td></tr>
+<tr><td class="tl" style="color:var(--o)">⑤ 데이터 비자산화</td><td>이 대리/박 과장/김 주임 PC에 데이터 묶임. 퇴사 시 히스토리 증발.</td><td>인수인계 기간 예상 2개월+</td></tr>
+<tr><td class="tl" style="color:var(--o)">⑥ 낮은 변화 실행력</td><td>"전에 ERP 도입하려다 포기했어요" (대표 발언)</td><td>ERP 검토 비용 500만원+ 매몰</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.2</span>CTS 분석 — 채널별 + 제조 원가 통합</div>
+<div class="co co-g">그린팜의 특수성: 제조+커머스 결합이므로 채널 CTS + 제조 CTS를 모두 봐야 한다. 가이드북 2.2 CTS 프레임워크 적용.</div>
+
+<div class="tx" style="font-weight:700;color:var(--wh);margin-bottom:8px">채널별 CTS</div>
+<div class="tw"><table>
+<thead><tr><th>항목</th><th>자사몰 (28억)</th><th>쿠팡 (24억)</th><th>네이버 (14억)</th><th>올리브영 (8억)</th><th>B2B (8억)</th></tr></thead>
+<tbody>
+<tr><td>(−) 제조원가 38%</td><td>−10.6</td><td>−9.1</td><td>−5.3</td><td>−3.0</td><td>−3.0</td></tr>
+<tr><td>(−) 수수료</td><td>−0.8 (PG 3%)</td><td>−3.6 (15%)</td><td>−1.7 (12%)</td><td>−2.4 (30%)</td><td>0</td></tr>
+<tr><td>(−) 물류</td><td>−1.7</td><td>−1.4</td><td>−0.8</td><td>−0.3</td><td>−0.4</td></tr>
+<tr><td>(−) 마케팅</td><td>−4.2</td><td>−2.8</td><td>−2.1</td><td>−0.5</td><td>−0.2</td></tr>
+<tr><td>(−) 채널 전용</td><td>0</td><td>−0.5 (로켓배송)</td><td>0</td><td>−0.8 (패키징+프로모션)</td><td>−0.3 (영업 인건비)</td></tr>
+<tr><td class="tl">= 공헌이익</td><td style="color:var(--gn);font-weight:700">10.7 (38%)</td><td style="color:var(--gn);font-weight:700">6.6 (28%)</td><td style="color:var(--gn);font-weight:700">4.1 (29%)</td><td style="color:var(--rd);font-weight:700">1.0 (13%)</td><td style="color:var(--gn);font-weight:700">4.1 (51%)</td></tr>
+</tbody></table></div>
+<div class="co co-r">핵심 발견: 올리브영 공헌이익률 13%. 전용 패키징+오프라인 프로모션+수수료 30%를 합치면 매출 8억에서 남는 게 1억. 영업 담당자 시간, 오프라인 재고 관리까지 더하면 실질 적자 가능성.</div>
+
+<div class="tx" style="font-weight:700;color:var(--wh);margin:20px 0 8px">제조 CTS — 숨은 복잡도 비용</div>
+<div class="tw"><table>
+<thead><tr><th>비용 항목</th><th>월간 금액</th><th>연간 금액</th><th>원인</th></tr></thead>
+<tbody>
+<tr><td class="tl">라인 전환 인건비</td><td>153만</td><td>1,836만</td><td>SKU 87개로 인한 빈번한 라인 전환</td></tr>
+<tr><td class="tl">라인 전환 기회비용</td><td>2,000만 (추정)</td><td>2.4억 (추정)</td><td>전환 시간에 생산 가능했던 제품</td></tr>
+<tr><td class="tl">긴급 발주 추가비용</td><td>200만</td><td>2,400만</td><td>수요 예측 부재, 재고 관리 미흡</td></tr>
+<tr><td class="tl">저회전 SKU 재고 비용</td><td>350만 (추정)</td><td>4,200만 (추정)</td><td>하위 50개 SKU 완제품+원재료 보관</td></tr>
+<tr><td class="tl" style="color:var(--rd)">합계</td><td style="color:var(--rd);font-weight:700">2,703만</td><td style="color:var(--rd);font-weight:700">3.2억</td><td style="color:var(--rd)">영업이익 3억과 맞먹는 숨은 비용</td></tr>
+</tbody></table></div>
+<div class="co co-k">영업이익 3억인데, 복잡도에서 새는 비용이 3.2억. SKU 87→30으로 줄이면 이 비용의 60~70%가 제거된다. 하지만 "어떤 SKU를 남길지"의 근거가 없다. 이것이 Phase 1 기초공사의 핵심.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">2.3</span>Phase 판단 + 우선순위 도출</div>
+<div class="tw"><table>
+<thead><tr><th>진단 소스</th><th>발견</th><th>구조화</th></tr></thead>
+<tbody>
+<tr><td class="tl">4-Lens</td><td>상위 SKU 35~42 vs 그린팜 87. 쿠팡 수수료 15%. 원재료 +12%.</td><td>SKU 복잡도 = 숨은 비용. 원가+수수료 양방향 마진 압박.</td></tr>
+<tr><td class="tl">인터뷰</td><td>"남는 게 없다." 주문 취합 3.5h/일. 채널별 수익성 미측정. 라인 전환 51h/월.</td><td>현장 체감은 정확. 숫자로 확인만 되면 바로 액션 가능.</td></tr>
+<tr><td class="tl">숫자</td><td>올리브영 공헌이익률 13%. 제조 복잡도 비용 연 3.2억. KPI 7개 중 4개 미측정.</td><td>측정 부재 + 복잡도 비용 = 전형적 Phase 1.</td></tr>
+</tbody></table></div>
+<div class="co co-k"><strong>판단: Phase 1 "비용 구조 개선".</strong> "남는 게 없다"를 "어떤 채널에서 어떤 SKU가 얼마나 새는지" + "제조 라인에서 얼마나 허비되는지" 숫자로 확인하는 것이 최우선.</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s01')">← STAGE 01 진단</button>
+<button class="tab-nav-btn primary" onclick="goTab('s03')">STAGE 03 설계로 →</button>
+</div>
+</div>
+
+<!-- ═══ STAGE 03 DESIGN ═══ -->
+<div class="panel" id="panel-s03">
+<div class="pd"><h2>STAGE 03 — DESIGN (설계)</h2><p>기초공사 확정 + 데이터 아키텍처 + 자동화 구조 설계</p></div>
+
+<section class="ch">
+<div class="ch-l">DESIGN</div>
+<div class="ch-t">설계 — 해결책 및 아키텍처</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">무엇을 어떻게 바꿀 것인가?</div>
+<div class="stage-q-sub">ANALYZE에서 확정된 핵심 과제에 대한 해결책을 설계한다. 기초공사를 먼저 확정하고, 그 위에 무엇이 가능한지를 정의한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.1</span>기초공사 확정</div>
+<div class="tw"><table>
+<thead><tr><th>후보</th><th>임팩트</th><th>이것이 되면</th><th>판단</th></tr></thead>
+<tbody>
+<tr><td class="tl">① 채널·SKU 통합 공헌이익 대시보드 (제조원가 포함)</td><td>경험→데이터 기반 전환</td><td>어떤 SKU가 적자이고, 어떤 채널에서 마진이 새는지 1분 안에 확인 가능. SKU 구조조정의 근거.</td><td style="color:var(--o);font-weight:700">기초공사 #1</td></tr>
+<tr><td class="tl">② 주문 통합 + 생산 계획 자동화</td><td>이 대리 3.5h→30min. 연 1,600만 절감.</td><td>4개 채널 주문이 한 곳으로 모이고, 생산 계획에 자동 반영. ①의 데이터 소스.</td><td style="color:var(--o);font-weight:700">기초공사 #2</td></tr>
+<tr><td class="tl">③ SKU 구조조정 (87→30~35)</td><td>복잡도 비용 연 2억+ 제거</td><td>①이 완료되어야 "어떤 SKU를 남길지" 근거가 생긴다.</td><td style="color:var(--gy)">①② 완료 후 실무자 추진</td></tr>
+<tr><td class="tl">④ 올리브영 채널 전략 재검토</td><td>공헌이익률 13% → 철수/축소/유지 결정</td><td>① 데이터 확보 후 대표가 판단.</td><td style="color:var(--gy)">① 완료 후 대표 판단</td></tr>
+</tbody></table></div>
+<div class="co co-t">②(주문 자동화) → ①(대시보드) 데이터 생성 → ③(SKU 구조조정) 근거 확보. 우리가 ①②를 깔아주면, 실무자가 ③④를 스스로 판단하고 실행할 수 있다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.2</span>기초공사 #1 — 공헌이익 대시보드 설계</div>
+<div class="co co-b">데이터 소스 → 계산 레이어 → Looker Studio 시각화 → 경보 시스템의 4단계 파이프라인으로 구성한다.</div>
+
+<div style="font-size:12px;font-weight:900;color:var(--wh);margin:22px 0 8px;padding:6px 0;border-bottom:1px solid var(--bd)">① 데이터 파이프라인 구조 — Google Sheets 4단계</div>
+<div class="fl">
+<div class="fs"><div class="fn">STEP 1</div><div class="fm">데이터 소스</div><div class="fd">raw_주문 탭<br>raw_제조원가 탭<br>raw_비용 탭</div></div>
+<div class="fs"><div class="fn">STEP 2</div><div class="fm">계산 레이어</div><div class="fd">calc_공헌이익<br>SKU별·채널별<br>수식 자동 계산</div></div>
+<div class="fs"><div class="fn">STEP 3</div><div class="fm">Looker Studio</div><div class="fd">P1~P5 페이지<br>실시간 대시보드<br>모바일 대응</div></div>
+<div class="fs"><div class="fn">STEP 4</div><div class="fm">경보 연결</div><div class="fd">Apps Script<br>Slack 자동 알림<br>5가지 트리거</div></div>
+</div>
+
+<div style="font-size:12px;font-weight:900;color:var(--wh);margin:22px 0 8px;padding:6px 0;border-bottom:1px solid var(--bd)">② Looker Studio 대시보드 페이지 설계 (P1~P5)</div>
+<div class="tw"><table>
+<thead><tr><th>페이지</th><th>제목</th><th>핵심 지표</th><th>주 사용자</th></tr></thead>
+<tbody>
+<tr><td style="color:var(--o);font-weight:700">P1</td><td class="tl">오늘의 현황 (Daily Overview)</td><td>일 주문량, 채널별 매출, 경보 현황 요약</td><td>이 대리 · 김 대표</td></tr>
+<tr><td style="color:var(--o);font-weight:700">P2</td><td class="tl">채널별 공헌이익</td><td>5개 채널 공헌이익률 비교, CTS 분해</td><td>김 대표</td></tr>
+<tr><td style="color:var(--o);font-weight:700">P3</td><td class="tl">SKU별 수익성 (A/B/C 등급)</td><td>87개 SKU 등급·공헌이익·재고일수</td><td>김 대표 · 이 대리</td></tr>
+<tr><td style="color:var(--o);font-weight:700">P4</td><td class="tl">재고 현황</td><td>완제품·원재료 재고, 품절 임박 SKU</td><td>이 대리 · 최 부장</td></tr>
+<tr><td style="color:var(--o);font-weight:700">P5</td><td class="tl">주간 추세</td><td>전주 대비 변동, 누적 KPI 트렌드</td><td>김 대표</td></tr>
+</tbody></table></div>
+
+<div style="font-size:12px;font-weight:900;color:var(--wh);margin:22px 0 8px;padding:6px 0;border-bottom:1px solid var(--bd)">③ 경보 시스템 설계 — Apps Script → Slack 자동 알림 5종</div>
+<div class="co co-b" style="margin-bottom:10px">색상 기준 — 🔴 즉시 대응 필요 &nbsp;|&nbsp; 🟡 주간 리뷰에서 검토 &nbsp;|&nbsp; ⚪ 이력 축적 후 판단</div>
+<div class="alert-grid">
+<div class="alert-item red"><span class="alert-emoji">🔴</span><div><div class="alert-action">[재고 경보] 히어로 SKU(A등급) 품절 임박 — 재고 7일 이하</div><div class="alert-text">긴급 생산 or 채널 일시 품절 처리 → 담당: 이 대리 + 최 부장</div></div></div>
+<div class="alert-item red"><span class="alert-emoji">🔴</span><div><div class="alert-action">[주문 급감 경보] 일 주문 전주 대비 −30% 이상</div><div class="alert-text">원인 확인: 채널별 주문 분포 확인 → 대시보드 P1 → 담당: 이 대리</div></div></div>
+<div class="alert-item yellow"><span class="alert-emoji">🟡</span><div><div class="alert-action">[수익성 경보] 채널 공헌이익률 전주 대비 −5%p</div><div class="alert-text">추정 원인: 프로모션 비용 증가 → 주간 리뷰에서 검토 → 담당: 김 대표</div></div></div>
+<div class="alert-item yellow"><span class="alert-emoji">🟡</span><div><div class="alert-action">[재고 누적 경보] C등급 SKU 재고 60일분 초과</div><div class="alert-text">SKU 구조조정 검토 → 대시보드 P3 → 담당: 김 대표</div></div></div>
+<div class="alert-item white"><span class="alert-emoji">⚪</span><div><div class="alert-action">[발주 이력 축적] 긴급 발주 발생</div><div class="alert-text">수요 예측 모듈 도입 검토 근거 축적 → 담당: 최 부장</div></div></div>
+</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">3.3</span>기초공사 #2 — 주문 통합 자동화 레시피</div>
+<div class="recipe">
+<span class="recipe-title">📋 자동화 레시피 카드 — 주문 통합 (Zapier + Apps Script)</span>
+<div class="recipe-row"><span class="recipe-key">TRIGGER</span><span class="recipe-val">매일 07:50 (Zapier Schedule)</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 1</span><span class="recipe-val">카페24 주문 API → JSON → Sheets "raw_주문" 탭 (채널="자사몰")</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 2</span><span class="recipe-val">쿠팡 Wing API → JSON → Sheets "raw_주문" 탭 (채널="쿠팡")</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 3</span><span class="recipe-val">네이버 커머스 API → JSON → Sheets "raw_주문" 탭 (채널="네이버")</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 4</span><span class="recipe-val">올리브영 발주 이메일 → Apps Script 파싱 → Sheets (채널="올리브영")</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 5</span><span class="recipe-val">B2B 발주서 → 박 과장이 Sheets 직접 입력 (초기. 이후 이메일 파싱 자동화)</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 6</span><span class="recipe-val">Apps Script: raw_주문 → SKU별 일일 수량 집계 → "생산요청" 탭 자동 생성</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 7</span><span class="recipe-val">생산요청 탭 → 라인 전환 최소화 순서로 자동 정렬 (같은 라인 SKU끼리 묶기)</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 8</span><span class="recipe-val">Slack #production 채널에 "오늘 생산 계획: 프로틴바 3종(1,200개) → 그래놀라 2종(800개)" 자동 포스팅</span></div>
+<div class="recipe-row"><span class="recipe-key">ACTION 9</span><span class="recipe-val">이상 주문 감지 (수량>100 / 신규 B2B 거래처) → Slack 🔴 알림</span></div>
+<div class="recipe-row"><span class="recipe-key">LOG</span><span class="recipe-val">"자동화로그" 탭 — 실행시간, 채널별 건수, 에러 여부</span></div>
+<div class="recipe-row"><span class="recipe-key">FAILURE</span><span class="recipe-val">API 오류 → 5분 후 2회 재시도 → 실패 시 이 대리 Slack DM + 수동 다운로드 안내</span></div>
+</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s02')">← STAGE 02 분석</button>
+<button class="tab-nav-btn primary" onclick="goTab('s04')">STAGE 04 실행으로 →</button>
+</div>
+</div>
+
+<!-- ═══ STAGE 04 EXECUTE ═══ -->
+<div class="panel" id="panel-s04">
+<div class="pd"><h2>STAGE 04 — EXECUTE (실행)</h2><p>설계를 현장에 적용한다. 기존 루틴을 유지하며 6주에 걸쳐 단계적 전환.</p></div>
+
+<section class="ch">
+<div class="ch-l">EXECUTE</div>
+<div class="ch-t">실행 — 현장 적용 및 성과 측정</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">설계가 현장에서 작동하는가?</div>
+<div class="stage-q-sub">완성된 솔루션을 한 번에 전환하지 않는다. 기존 루틴을 유지하며 단계적으로 전환한다. 가이드북 4.1의 수동→자동 3단계를 그대로 적용.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">4.1</span>6주 실행 로드맵</div>
+<div class="co co-b">가이드북 4.1의 수동(Step1) → 반자동(Step2) → 자동(Step3) 전환 구조를 그린팜 현실에 맞게 6주로 설계.</div>
+
+<div style="display:flex;gap:10px;margin:12px 0 10px;flex-wrap:wrap;font-size:11px;align-items:center">
+  <span style="color:var(--gy);font-weight:700;font-size:10px;letter-spacing:1px;margin-right:4px">주차 색상 = 자동화 전환 단계</span>
+  <span style="background:rgba(255,255,255,.04);border:1px solid var(--bd);padding:4px 12px;border-radius:5px;color:#ccc">⬜ 흰색 — 인프라·도구 구축 단계 (전환 전 준비)</span>
+  <span style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.4);padding:4px 12px;border-radius:5px;color:var(--yw)">🟡 노랑 — 수동→반자동 전환이 시작되는 주차</span>
+  <span style="background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.4);padding:4px 12px;border-radius:5px;color:var(--gn)">🟢 초록 — 자동화 완전 정착 (Step3 진입)</span>
+</div>
+
+<div class="tw"><table>
+<thead><tr><th>주차</th><th>자동화 단계</th><th>작업 내용</th><th>담당</th><th>산출물</th></tr></thead>
+<tbody>
+<tr>
+  <td class="tl">Week 1</td>
+  <td style="color:#888;font-size:10px;font-weight:700;white-space:nowrap">⬜ 준비</td>
+  <td>데이터 소스 구축. Sheets 6개 탭 생성. raw_제조원가 탭에 공장장과 함께 SKU별 BOM 입력 (87개). 기준정보 탭 채널별 수수료율 확정.</td>
+  <td>컨설턴트 + 공장장</td>
+  <td>Sheets 구조 완성 + BOM 데이터</td>
+</tr>
+<tr style="background:rgba(255,215,0,.04)">
+  <td class="tl" style="color:var(--yw)">Week 2</td>
+  <td style="color:var(--yw);font-size:10px;font-weight:700;white-space:nowrap">🟡 Step 1<br>수동 수집 시작</td>
+  <td>수동 데이터 수집. 이 대리가 기존대로 주문 취합하되, 추가로 Sheets raw_주문 탭에도 복사해서 붙여넣기. 양식만 통일. <strong>이 주의 데이터가 기준선.</strong></td>
+  <td>이 대리 (기존 루틴 유지)</td>
+  <td>1주치 통합 주문 데이터 (수동)</td>
+</tr>
+<tr>
+  <td class="tl">Week 3</td>
+  <td style="color:#888;font-size:10px;font-weight:700;white-space:nowrap">⬜ 준비</td>
+  <td>계산 레이어 + 대시보드 구축. calc_공헌이익 수식 완성. Looker Studio 연결. P1~P5 페이지 구성. 이 대리와 함께 샘플 10개 SKU 수동 검산.</td>
+  <td>컨설턴트</td>
+  <td>대시보드 v1 (1주치 데이터)</td>
+</tr>
+<tr style="background:rgba(255,215,0,.04)">
+  <td class="tl" style="color:var(--yw)">Week 4</td>
+  <td style="color:var(--yw);font-size:10px;font-weight:700;white-space:nowrap">🟡 Step 2<br>반자동 수집 시작</td>
+  <td>주문 자동화 구축. Zapier로 카페24+쿠팡+네이버 API 연동. 자동 수집 시작하되, 이 대리가 매일 기존 방식과 비교 검수. 올리브영+B2B는 아직 수동.</td>
+  <td>컨설턴트 + 이 대리</td>
+  <td>3채널 자동 수집 + 수동 검수 병행</td>
+</tr>
+<tr>
+  <td class="tl">Week 5</td>
+  <td style="color:#888;font-size:10px;font-weight:700;white-space:nowrap">⬜ 준비</td>
+  <td>경보 시스템 + 생산 계획 자동화. Apps Script로 경보 트리거 설정. 생산요청 탭 자동 생성 + 라인 전환 최소화 정렬. 공장장에게 Slack으로 자동 전달. 대표에게 대시보드 시연.</td>
+  <td>컨설턴트 + 공장장</td>
+  <td>경보 가동 + 생산 계획 반자동</td>
+</tr>
+<tr style="background:rgba(0,200,150,.04)">
+  <td class="tl" style="color:var(--gn)">Week 6</td>
+  <td style="color:var(--gn);font-size:10px;font-weight:700;white-space:nowrap">🟢 Step 3<br>자동화 완전 정착</td>
+  <td>Step 3 전환 + 첫 성과 리뷰. 이 대리가 "어차피 자동으로 되니까 수동 안 해도 되네" 확인. 검수 빈도를 일일→주 2회로 줄임. 대표에게 1차 CTS 결과 + SKU 구조조정 후보 리포트 전달.</td>
+  <td>전원</td>
+  <td>자동화 Step 3 진입 + SKU 구조조정 근거</td>
+</tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">4.2</span>Before / After 프로세스 맵 — 이 대리의 하루</div>
+<div class="cp">
+<div class="cp-c">
+<h4>❌ AS-IS (3시간 30분)</h4>
+<div class="cp-i">08:30 카페24 엑셀 다운 (15분)</div>
+<div class="cp-i">08:45 쿠팡 Wing 엑셀 다운 (15분)</div>
+<div class="cp-i">09:00 네이버 커머스 엑셀 다운 (10분)</div>
+<div class="cp-i">09:10 올리브영 이메일 발주서 확인 (10분)</div>
+<div class="cp-i">09:20 4개 양식 통일 (60분)</div>
+<div class="cp-i">10:20 3PL 발주서 변환+발송 (30분)</div>
+<div class="cp-i">10:50 품절 체크+채널 품절 처리 (30분)</div>
+<div class="cp-i" style="color:var(--rd);font-weight:700;margin-top:8px;padding-top:6px;border-top:1px solid var(--bd)">판단 15분 / 나머지 반복 수작업</div>
+</div>
+<div class="cp-c">
+<h4>✅ TO-BE (30분)</h4>
+<div class="cp-i">08:00 Slack #orders "주문 수집 완료" 확인 (2분)</div>
+<div class="cp-i">08:02 이상 주문 리스트 확인·처리 (5분)</div>
+<div class="cp-i">08:07 Slack #production 생산 계획 확인 (2분)</div>
+<div class="cp-i">08:10 🔴 경보 있으면 즉시 대응 (최대 15분)</div>
+<div class="cp-i">08:25 올리브영 이메일 Sheets 입력 (10분)</div>
+<div class="cp-i" style="color:var(--o);margin-top:8px;padding-top:6px;border-top:1px solid var(--bd)">판단 20분 / 3시간 10분 자동화</div>
+</div>
+</div>
+<div class="co co-t">Week 6 성과 예측: 이 대리 업무 시간 3.5h/일 → 30분/일 (연 약 1,600만원 절감). 대시보드로 "올리브영 공헌이익률 13% 적자 구조", "C등급 SKU 38개 단종 시 복잡도 비용 연 2억 절감 가능" 확인. 대표가 데이터 보고 스스로 판단할 수 있는 상태.</div>
+</div>
+</section>
+
+<div class="tab-nav">
+<button class="tab-nav-btn" onclick="goTab('s03')">← STAGE 03 설계</button>
+<button class="tab-nav-btn primary" onclick="goTab('s05')">STAGE 05 확장으로 →</button>
+</div>
+</div>
+
+<!-- ═══ STAGE 05 SCALE ═══ -->
+<div class="panel" id="panel-s05">
+<div class="pd"><h2>STAGE 05 — SCALE (확장)</h2><p>인수인계 + 담당자 자립 운영 + 모듈 확장 가이드</p></div>
+
+<section class="ch">
+<div class="ch-l">SCALE</div>
+<div class="ch-t">확장 — 내재화 및 자립</div>
+<div class="stage-q">
+<span class="stage-q-label">이 단계의 핵심 질문</span>
+<div class="stage-q-text">담당자가 없어도 돌아가는가?</div>
+<div class="stage-q-sub">컨설턴트가 떠난 후에도 시스템이 작동해야 한다. 가이드북 5.1~5.3의 자립 기준, 에이전트 스펙 카드, 모듈 확장 가이드를 그린팜에 적용한다.</div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.1</span>에이전트 스펙 카드 — 그린팜 전체 자동화 목록</div>
+<div class="tx">가이드북 5.1의 11항목 스펙 카드 양식을 그린팜 전체 자동화에 적용. 담당자가 바뀌어도 운영이 끊기지 않는다.</div>
+<div class="tw"><table>
+<thead><tr><th>에이전트</th><th>Purpose</th><th>Trigger</th><th>Owner</th><th>Human Point</th></tr></thead>
+<tbody>
+<tr><td class="tl">주문 수집</td><td>4채널 주문을 Sheets에 자동 적재</td><td>매일 07:50</td><td>이 대리</td><td>에러 시 수동 다운로드 (Slack 안내)</td></tr>
+<tr><td class="tl">이상 주문 감지</td><td>대량주문/신규거래처/품절SKU 감지</td><td>주문 수집 완료 후</td><td>이 대리</td><td>이상 건 승인/보류/취소 판단</td></tr>
+<tr><td class="tl">생산 계획 생성</td><td>일일 주문 → 생산 스케줄 자동 정렬</td><td>매일 08:00</td><td>공장장</td><td>최종 생산 순서 확인 + 긴급 건 조정</td></tr>
+<tr><td class="tl">품절 경보</td><td>A등급 SKU 재고 7일 이하 시 알림</td><td>매일 09:00</td><td>이 대리</td><td>긴급 생산 요청 or 채널 품절 처리 판단</td></tr>
+<tr><td class="tl">주간 KPI 경보</td><td>채널 공헌이익률 변동, C등급 재고 누적</td><td>매주 월 09:00</td><td>김 대표</td><td>주간 리뷰에서 액션 결정</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.2</span>이 대리의 새로운 일일/주간 루틴</div>
+<div class="tx">자립 운영의 핵심은 담당자가 새 루틴을 자신의 것으로 받아들이는 것이다.</div>
+
+<div class="tw"><table>
+<thead><tr><th colspan="3" style="color:var(--wh)">일일 루틴 (30분)</th></tr><tr><th>시간</th><th>행동</th><th>소요</th></tr></thead>
+<tbody>
+<tr><td class="tl">08:00</td><td>Slack #orders "주문 수집 완료" 메시지 확인. 에러 있으면 해당 채널 수동 다운로드.</td><td>2분</td></tr>
+<tr><td class="tl">08:02</td><td>이상 주문 리스트 확인 → 승인/보류/취소 처리.</td><td>5분</td></tr>
+<tr><td class="tl">08:07</td><td>Slack #production 생산 계획 확인 → 공장장에게 "확인했습니다" 리액션.</td><td>2분</td></tr>
+<tr><td class="tl">08:10</td><td>🔴 경보가 있으면 즉시 대응. 없으면 대시보드 P1 30초 확인.</td><td>3~15분</td></tr>
+<tr><td class="tl">08:25</td><td>올리브영 이메일 발주서 확인 → Sheets 입력. B2B는 박 과장 입력 확인.</td><td>10분</td></tr>
+</tbody></table></div>
+
+<div class="tw" style="margin-top:12px"><table>
+<thead><tr><th colspan="2" style="color:var(--wh)">주간 루틴</th></tr><tr><th>요일</th><th>행동</th></tr></thead>
+<tbody>
+<tr><td class="tl">월 09:30</td><td>주간 리뷰 데이터 준비: 대시보드 P5(추세)에서 전주 대비 변동 확인. 🟡 경보 항목 정리. 대표에게 "이번 주 주요 변동" Slack 메시지 3줄로 요약.</td></tr>
+<tr><td class="tl">월 10:00</td><td>대표 주간 리뷰 (15분): 대시보드 P1 함께 보며 "이번 주 액션 있는지" 판단. 있으면 담당+기한 확정.</td></tr>
+<tr><td class="tl">목 14:00</td><td>재고 체크: 품절 임박 리스트 확인. 다음 주 프로모션 예정 SKU 있으면 생산량 미리 조정 요청.</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.3</span>모듈 확장 가이드 — 그린팜 전용 로드맵</div>
+<div class="co co-b">가이드북 5.2의 모듈 확장 가이드를 그린팜 상황에 맞게 구체화. 전제 조건이 핵심이다.</div>
+<div class="tw"><table>
+<thead><tr><th>순서</th><th>모듈</th><th>전제 조건</th><th>시점</th><th>예상 임팩트</th></tr></thead>
+<tbody>
+<tr><td style="color:var(--o);font-weight:700">다음 1</td><td class="tl">SKU 구조조정 (87→30~35)</td><td>공헌이익 대시보드 2개월 데이터 축적. C등급 SKU 리스트 확정.</td><td>기초공사 완료 후 즉시</td><td>복잡도 비용 연 2억+ 절감</td></tr>
+<tr><td style="color:var(--o);font-weight:700">다음 2</td><td class="tl">수요 예측 → 원재료 발주 최적화</td><td>주문 데이터 6개월+ 축적 (기초공사 #2로 수집 중)</td><td>기초공사 후 4~5개월</td><td>긴급 발주 제거 (연 2,400만 절감)</td></tr>
+<tr><td style="color:var(--o);font-weight:700">다음 3</td><td class="tl">생산 스케줄링 고도화</td><td>SKU 구조조정 완료 + 수요 예측 안정화</td><td>기초공사 후 6개월+</td><td>라인 전환 시간 50% 추가 감소</td></tr>
+<tr><td style="color:var(--o);font-weight:700">다음 4</td><td class="tl">자사몰 재구매 자동화 (RFM)</td><td>고객 구매 이력 SSOT 구축 + 3개월 데이터</td><td>Phase 2 진입 시</td><td>재구매율 18%→30% 목표</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="s">
+<div class="st"><span class="st-num">5.4</span>프로젝트 최종 성과 — 6주 전/후 비교</div>
+<div class="tw"><table>
+<thead><tr><th>지표</th><th>Before (프로젝트 전)</th><th>After (6주 후)</th><th>변화</th></tr></thead>
+<tbody>
+<tr><td class="tl">이 대리 주문 업무 시간</td><td>3.5h/일</td><td style="color:var(--gn)">0.5h/일</td><td style="color:var(--gn)">−86% (연 1,600만 절감)</td></tr>
+<tr><td class="tl">채널별 공헌이익률</td><td>미측정</td><td style="color:var(--gn)">실시간 확인 가능</td><td style="color:var(--gn)">측정 인프라 구축 완료</td></tr>
+<tr><td class="tl">SKU별 수익성</td><td>미측정</td><td style="color:var(--gn)">87개 전수 분석 완료. 적자 23개 식별.</td><td style="color:var(--gn)">구조조정 근거 확보</td></tr>
+<tr><td class="tl">생산 계획 수립</td><td>수기 (공장장 경험)</td><td style="color:var(--gn)">데이터 기반 자동 생성 + 라인 전환 최소화 정렬</td><td style="color:var(--gn)">의사결정 속도 향상</td></tr>
+<tr><td class="tl">품절 대응</td><td>사후 대응 (품절 후 인지)</td><td style="color:var(--gn)">7일 전 사전 경보</td><td style="color:var(--gn)">매출 손실 방지</td></tr>
+<tr><td class="tl">복잡도 비용 가시성</td><td>인지 못 함</td><td style="color:var(--gn)">연 3.2억 확인. SKU 구조조정 시 2억+ 절감 가능 확인.</td><td style="color:var(--gn)">다음 액션 근거 확보</td></tr>
+</tbody></table></div>
+<div class="co co-k">6주 프로젝트로 "남는 게 없다"의 원인을 숫자로 확인했고, 다음 액션(SKU 구조조정)의 근거를 만들었다. SKU 구조조정이 실행되면 연 2억+ 비용 절감. 이 판단은 이제 대표가 대시보드를 보고 스스로 내릴 수 있다. <strong>우리가 없어도.</strong></div>
+</div>
+</section>
+
+<!-- COMPLETE -->
+<div class="complete-screen" id="completeScreen" style="display:none">
+<div class="complete-icon">✅</div>
+<div class="complete-title">시뮬레이션 완료</div>
+<div class="complete-sub">그린팜 푸드 AX 컨설팅 전 과정을 따라왔습니다.<br>가이드북과 연결해서 다시 한 번 확인하세요.</div>
+<div class="complete-box">
+<h3>가이드북과의 연결 포인트</h3>
+<div class="complete-item">4-Lens 사전 리서치 → 가이드북 1.1</div>
+<div class="complete-item">인터뷰 구조화 패턴 → 가이드북 2.3</div>
+<div class="complete-item">CTS 분석 + 6대 병목 → 가이드북 2.2 / 2.1</div>
+<div class="complete-item">기초공사 확정 논리 → 가이드북 3.1</div>
+<div class="complete-item">수동→자동 3단계 전환 → 가이드북 4.1</div>
+<div class="complete-item">에이전트 스펙 카드 + 모듈 확장 → 가이드북 5.1 / 5.2</div>
+</div>
+<button class="restart-btn" onclick="restart()">처음부터 다시 보기</button>
+</div>
+
+<div class="tab-nav" id="s05Nav">
+<button class="tab-nav-btn" onclick="goTab('s04')">← STAGE 04 실행</button>
+<button class="tab-nav-btn primary" onclick="finish()">시뮬레이션 완료 ✓</button>
+</div>
+</section>
+</div>
+
+<div class="footer">
+<p>underdogs. | 그린팜 푸드 AX 시뮬레이션 — DIAGNOSE → ANALYZE → DESIGN → EXECUTE → SCALE 전 과정</p>
+</div>
+
+<script>
+const TABS=['intro','s01','s02','s03','s04','s05'];
+const STORE_KEY='ax_sim_done';
+function getDone(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]');}catch(e){return[];}}
+function markDone(tab){var d=getDone();if(!d.includes(tab)){d.push(tab);}localStorage.setItem(STORE_KEY,JSON.stringify(d));}
+function updateProgress(){
+  var d=getDone();
+  var pct=Math.round(d.length/TABS.length*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=d.length+' / '+TABS.length+' 완료';
+  TABS.forEach(function(t){
+    var btn=document.querySelector('[data-tab="'+t+'"]');
+    if(!btn)return;
+    if(d.includes(t))btn.classList.add('done');
+    else btn.classList.remove('done');
+  });
+}
+function goTab(tab){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  var p=document.getElementById('panel-'+tab);
+  if(p)p.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  var btn=document.querySelector('[data-tab="'+tab+'"]');
+  if(btn)btn.classList.add('active');
+  markDone(tab);
+  updateProgress();
+
+// 복사 방지
+document.addEventListener("copy",function(e){e.preventDefault();});
+document.addEventListener("cut",function(e){e.preventDefault();});
+document.addEventListener("contextmenu",function(e){e.preventDefault();});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+document.addEventListener("selectstart",function(e){e.preventDefault();});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggle(h){
+  h.classList.toggle('open');
+  h.nextElementSibling.classList.toggle('open');
+}
+function finish(){
+  markDone('s05');
+  updateProgress();
+
+// 복사 방지
+document.addEventListener("copy",function(e){e.preventDefault();});
+document.addEventListener("cut",function(e){e.preventDefault();});
+document.addEventListener("contextmenu",function(e){e.preventDefault();});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+document.addEventListener("selectstart",function(e){e.preventDefault();});
+  document.getElementById('completeScreen').style.display='block';
+  document.getElementById('s05Nav').style.display='none';
+  document.getElementById('completeScreen').scrollIntoView({behavior:'smooth'});
+}
+function restart(){
+  localStorage.removeItem(STORE_KEY);
+  updateProgress();
+
+// 복사 방지
+document.addEventListener("copy",function(e){e.preventDefault();});
+document.addEventListener("cut",function(e){e.preventDefault();});
+document.addEventListener("contextmenu",function(e){e.preventDefault();});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+document.addEventListener("selectstart",function(e){e.preventDefault();});
+  goTab('intro');
+}
+updateProgress();
+
+// 복사 방지
+document.addEventListener("copy",function(e){e.preventDefault();});
+document.addEventListener("cut",function(e){e.preventDefault();});
+document.addEventListener("contextmenu",function(e){e.preventDefault();});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+document.addEventListener("selectstart",function(e){e.preventDefault();});
+</script>
+</body>
+</html>
